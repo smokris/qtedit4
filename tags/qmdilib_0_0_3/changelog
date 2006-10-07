@@ -1,0 +1,24 @@
+$Id$
+
+0.0.3  - 7 Oct 2006 - Diego Iastrubni <elcuco@kde.org>
+ * new feature: QWorkspace children are also checked for qmdiClient interface,
+   feature coded by Nox PasNox <pasnox@gmail.com>
+ * new feature: merge point for qmdiActionGroup
+ * new class: qmdiWorkspace, a qmdiServer based on QWorkspace
+ * core refactoring: qmdiClient does not contain QObject *self any more
+ * code refactoring: qmdiServer now contains a pointer to the host (was in qmdiTabWidget)
+ * code refactoring: demos should be easier to read, and hopefully maintain
+ * removed most internal frames from all widgets in demos, the demos will look nicer
+ * all the documentation has been spell checked
+
+0.0.2  - 11 Jul 06 - Diego Iastrubni <elcuco@kde.org>
+ * many documentation updates
+ * compilation problems on mingw should be fixed
+
+0.0.2-pre  - 19 Jul 06 - Diego Iastrubni <elcuco@kde.org>
+ * fixed many flickering issues, now it only flicker when you add QWidgets to qmdiActionGroup
+ * added demos (4 and 5) which demonstrate how to build the code into dynamic and static libraries
+ 
+0.0.1 - 11 Jun 06 - Diego Iastrubni <elcuco@kde.org>
+ * initial release
+ 
