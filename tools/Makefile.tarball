@@ -1,0 +1,18 @@
+# you can overide them when calling this Makefile
+NAME		=	$(shell basename `pwd`)
+VERSION		= 	r$(SVN_RELEASE)
+
+
+TMP_DIR		:=	$(shell mktemp /tmp/svn-export.XXXXXXXXXX -d -q)
+SVN_RELEASE	=	$(shell svn info | grep Revision | awk '{ print $$2 }' )
+OUTPUT_DIR_NAME	=	$(TMP_DIR)/$(NAME)-$(VERSION)
+FILE_NAME	=	$(NAME)-$(VERSION).tar.gz
+
+
+all:
+	rm -fr $(TMP_DIR)
+	mkdir -p $(TMP_DIR)
+	svn export . $(OUTPUT_DIR_NAME)
+	cd $(OUTPUT_DIR_NAME) && doxygen
+	tar -czf $(FILE_NAME) -C $(TMP_DIR)/ .
+	rm -fr $(TMP_DIR)
