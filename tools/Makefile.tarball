@@ -13,6 +13,7 @@ all:
 	rm -fr $(TMP_DIR)
 	mkdir -p $(TMP_DIR)
 	svn export . $(OUTPUT_DIR_NAME)
-	cd $(OUTPUT_DIR_NAME) && doxygen
+	cd $(OUTPUT_DIR_NAME) && mkdir -p doc && (doxygen --quiet|| rm -fr doc || true )
 	tar -czf $(FILE_NAME) -C $(TMP_DIR)/ .
 	rm -fr $(TMP_DIR)
+	
