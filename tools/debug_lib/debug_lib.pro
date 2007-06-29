@@ -8,3 +8,4 @@ CONFIG +=   console \
   release
 QT +=   core
 DEFINES +=   NO_DEBUG_CLASS_
+VERSION = 0.0.1

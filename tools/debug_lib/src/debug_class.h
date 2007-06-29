@@ -1,3 +1,10 @@
+/**
+ * \file debug_class.h
+ * \brief declaration of DebugClass and several helper functions
+ * \author Diego Iastrubni (elcuco@kde.org)
+ * license Modified BSD license
+ */
+ 
 #ifndef __DEBUG_CLASS_H__
 #define __DEBUG_CLASS_H__
 
