@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/" >
+        <file>images/ajouter.png</file>
+        <file>images/buildrun.png</file>
+        <file>images/helpassistant.png</file>
+        <file>images/next.png</file>
+        <file>images/previous.png</file>
+        <file>images/supprimer.png</file>
+    </qresource>
+</RCC>

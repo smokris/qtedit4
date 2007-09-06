@@ -25,6 +25,9 @@ Q_OBJECT
 public:
 	HelpViewerImpl( QWidget * parent = 0 );
 private slots:
+	void on_indexListView_activated(QModelIndex index);
+	void on_helpSuggestions_linkActivated(QString link);
+	void on_popularPages_linkActivated(QString link);
 	void on_mainTab_currentChanged(int index);
 	void on_helpBrowser_sourceChanged(QUrl );
 	void on_indexEdit_textEdited(QString );
@@ -44,6 +47,4 @@ private:
 	HelpViewer::LRU	*m_classesLRU;
 };
 
-
 #endif
-

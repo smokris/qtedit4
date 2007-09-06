@@ -21,3 +21,4 @@ SOURCES += src/mainwindowimpl.cpp \
  src/dcffile.cpp \
  src/dcfmodel.cpp \
  src/lru.cpp
+RESOURCES += helpviewer.qrc

@@ -24,9 +24,6 @@ void LRU::touchItem( QString name )
 			(*i).value ++;
 			found = true;
 			
-			//print_list();
-			//qDebug(" value %d - %d ", (*p).value, (*i).value );
-			
 			// should be push back?
 			if ( (*i).value > (*p).value )
 			{
@@ -35,8 +32,6 @@ void LRU::touchItem( QString name )
 				//if (item.value != 3)
 				items.insert( i+1, item );
 			}
-			//else
-				//qDebug("no incrementing is needed");
 			
 			break;
 		}
@@ -53,7 +48,7 @@ void LRU::touchItem( QString name )
 		items.push_back(item);
 	}
 	
-	print_list();
+	//print_list();
 }
 
 LRU_List LRU::getTop( int n )

@@ -66,6 +66,8 @@ QVariant dcfModel::data( const QModelIndex &index, int roles ) const
 
 	if (roles == Qt::DisplayRole)
 		return m_dcf->sections[index.row()].title;
+	else if (roles == Qt::StatusTipRole)
+		return m_dcf->sections[index.row()].reference;
 	else
 		return QVariant();
 }
