@@ -37,7 +37,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex" >
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="indexTab" >
       <attribute name="title" >
@@ -89,21 +89,7 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text" >
-          <string>Popular pages (based on previous searches):
-&lt;ul>
-&lt;li>&lt;a href="qabstractbutton.html">QAbstractButton&lt;/a>
-
-&lt;li>&lt;a href="qmenubar.html">QMenuBar&lt;/a>
-
-&lt;li>&lt;a href="qtextedit.html">QTextEdit&lt;/a>
-
-&lt;li>&lt;a href="qaction.html">QAction&lt;/a>
-
-&lt;li>&lt;a href="foreach.html">foreach&lt;/a>
-
-
-&lt;/ul>
-&lt;br></string>
+          <string/>
          </property>
          <property name="textFormat" >
           <enum>Qt::RichText</enum>
@@ -242,6 +228,13 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="Line" name="line" >
+         <property name="orientation" >
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLineEdit" name="locationBar" />

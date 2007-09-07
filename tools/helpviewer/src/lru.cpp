@@ -10,7 +10,6 @@ LRU::LRU()
 
 void LRU::touchItem( QString name )
 {
-	//qDebug("touching %s", qPrintable(name) );
 	bool found = false;
 	int location = 0;
 	
@@ -20,19 +19,9 @@ void LRU::touchItem( QString name )
 	{
 		if ((*i).name == name)
 		{
-			LRU_List::iterator p = i - 1;
 			(*i).value ++;
 			found = true;
-			
-			// should be push back?
-			if ( (*i).value > (*p).value )
-			{
-				LRU_item item = (*p);
-				i = items.erase(p);
-				//if (item.value != 3)
-				items.insert( i+1, item );
-			}
-			
+			updateItemLocation( i );
 			break;
 		}
 		location++;
@@ -47,8 +36,6 @@ void LRU::touchItem( QString name )
 		item.value = 1;
 		items.push_back(item);
 	}
-	
-	//print_list();
 }
 
 LRU_List LRU::getTop( int n )
@@ -78,4 +65,23 @@ void LRU::print_list()
 	qDebug("list end");
 }
 
+void LRU::updateItemLocation( LRU_List::iterator i )
+{
+	LRU_List::iterator p = i - 1;
+	LRU_item item = (*p);
+	while ( ((*i).value >= (*p).value) && (i != items.begin()) )
+	{
+		/*
+		if ( (*p).age > ( (*i).age ) )
+			continue;*/
+		item = (*p);
+		
+		i = items.erase(p);
+		i = items.insert( i+1, item );
+		print_list();
+
+		p = i - 1;
+	}
 }
+
+} // end of namespace

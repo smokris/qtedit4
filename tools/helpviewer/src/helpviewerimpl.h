@@ -36,7 +36,10 @@ private slots:
 	void on_mainTab_currentChanged(int index);
 	void on_helpBrowser_sourceChanged(QUrl );
 	void on_indexEdit_textEdited(QString );
+
+private:
 	void updateWindowTitle();
+	void updatePopularLinks();
 
 public slots:
 	void toggleDock();
@@ -52,6 +55,7 @@ private:
 	dcfModel	*m_dcfModel;
 	QSortFilterProxyModel *m_filterModel;
 	HelpViewer::LRU	*m_classesLRU;
+	int		m_showMaxTop;
 };
 
 #endif

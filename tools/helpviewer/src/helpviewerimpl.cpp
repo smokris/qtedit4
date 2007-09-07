@@ -72,6 +72,8 @@ HelpViewerImpl::HelpViewerImpl( QWidget * parent )
 		m_classesLRU->touchItem( "qstring.html" );
 		m_classesLRU->touchItem( "qwidget.html" );
 	}
+	m_showMaxTop = 4;
+	updatePopularLinks();
 }
 
 /// Event filter to catch keyboard events on the indexEdit
@@ -197,18 +199,7 @@ void HelpViewerImpl::on_mainTab_currentChanged(int index)
 		
 	indexEdit->setFocus();
 	indexEdit->activateWindow();
-	
-	QString s = tr("Popular pages (based on previous searches)") + "<ul>";
-	HelpViewer::LRU_List l = m_classesLRU->getTop(5);
-	HelpViewer::LRU_List::iterator i;
-
-	for (i = l.begin(); i != l.end(); ++i)
-	{
-		//s += QString("<li><a href='%1'>%2</a></li>").arg((*i).name).arg((*i).name);
-		s +=QString( "<li><a href='%1'>%2 (%3 hits)</a></li>").arg((*i).name).arg((*i).name).arg((*i).value );
-	}
-	s+= "</ul><br>";
-	popularPages->setText( s );
+	updatePopularLinks();
 }
 
 void HelpViewerImpl::on_helpSuggestions_linkActivated(QString link)
@@ -252,4 +243,19 @@ void HelpViewerImpl::updateWindowTitle()
 			m_dock->setWindowTitle( s + " - " + helpBrowser->documentTitle() );
 			break;
 	}
+}
+
+void HelpViewerImpl::updatePopularLinks()
+{
+	QString s = tr("Popular pages (based on previous searches)") + "<ul>";
+	HelpViewer::LRU_List l = m_classesLRU->getTop(m_showMaxTop);
+	HelpViewer::LRU_List::iterator i;
+
+	for (i = l.begin(); i != l.end(); ++i)
+	{
+		//s += QString("<li><a href='%1'>%2</a></li>").arg((*i).name).arg((*i).name);
+		s +=QString( "<li><a href='%1'>%2 (%3 hits)</a></li>").arg((*i).name).arg((*i).name).arg((*i).value );
+	}
+	s+= "</ul><br>";
+	popularPages->setText( s );
 }

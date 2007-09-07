@@ -18,7 +18,6 @@ struct LRU_item
 };
 
 typedef QLinkedList<LRU_item> LRU_List;
-//typedef 
 
 class LRU  
 {
@@ -28,6 +27,7 @@ public:
 	LRU_List getTop( int n = 5 );
 	void print_list();
 private:
+	void updateItemLocation( LRU_List::iterator i );
 	LRU_List items;
 };
 
