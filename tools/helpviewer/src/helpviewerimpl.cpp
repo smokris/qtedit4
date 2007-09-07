@@ -14,6 +14,7 @@
 #include <QUrl>
 #include <QSortFilterProxyModel>
 #include <QTimer>
+#include <QKeyEvent>
 
 #include <QDebug>
 
@@ -31,7 +32,7 @@
 ///	* qtextedit.h
 ///	* qstring.h
 ///	* qwidget.h
-///  
+///
 HelpViewerImpl::HelpViewerImpl( QWidget * parent ) 
 	: QObject(parent)
 {
@@ -47,13 +48,17 @@ HelpViewerImpl::HelpViewerImpl( QWidget * parent )
 	connect( helpSuggestions, SIGNAL(linkActivated(QString)), this, SLOT(on_helpSuggestions_linkActivated(QString)));
 	connect( popularPages, SIGNAL(linkActivated(QString)), this, SLOT(on_popularPages_linkActivated(QString)));
 	connect( indexListView, SIGNAL(activated(QModelIndex )), this, SLOT(on_indexListView_activated(QModelIndex)));
+	connect( indexEdit, SIGNAL(returnPressed()), this, SLOT(on_indexEdit_returnPressed()) );
 	
 	m_dock->setWidget( m_dock_widget );
 	m_dock->resize( parent->width() / 6, parent->height() );
-	m_dock->setWindowTitle( tr("Help browser") );
+	updateWindowTitle();
+	
 	helpBrowser->setSearchPaths( QStringList( QLibraryInfo::location ( QLibraryInfo::DocumentationPath ) + "/html/" ) );
 	helpBrowser->setSource( QUrl("index.html") );
 	helpBrowser->zoomOut( 1 );
+	
+	indexEdit->installEventFilter( this );
 	
 	locationBar->hide();
 	QTimer::singleShot( 0, this, SLOT(loadFile()));
@@ -67,6 +72,34 @@ HelpViewerImpl::HelpViewerImpl( QWidget * parent )
 		m_classesLRU->touchItem( "qstring.html" );
 		m_classesLRU->touchItem( "qwidget.html" );
 	}
+}
+
+/// Event filter to catch keyboard events on the indexEdit
+/// Send Key_Down, Key_Up, Key_PageDown, Key_PageUp to the indexListView
+/// This way the user can navigate the list of itmes when the focus
+/// is on the filter input line
+/// Also, pressing escape while focusing the indexEdit will clear it.
+bool HelpViewerImpl::eventFilter(QObject *obj, QEvent *event)
+{
+	if ( (obj == indexEdit) && (event->type() == QEvent::KeyPress) )
+	{
+		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+		switch(keyEvent->key()){
+			case Qt::Key_Up:
+			case Qt::Key_Down:
+			case Qt::Key_PageDown:
+			case Qt::Key_PageUp:
+				QApplication::sendEvent(indexListView, event);
+				return true;
+			
+			case Qt::Key_Escape:
+				indexEdit->clear();
+				return true;
+		}
+	}
+	
+	// standard event processing
+	return QObject::eventFilter(obj, event);
 }
 
 /// toggle the help dock window:
@@ -100,6 +133,8 @@ void HelpViewerImpl::showContents()
 	showPage("index.html");
 }
 
+/// load the default file (qt.dcf) into the m_dcfFile and setup the
+/// model for displaing it as needed
 void HelpViewerImpl::loadFile()
 {
 	m_dcfFile = new dcfFile;
@@ -131,9 +166,13 @@ void HelpViewerImpl::on_indexEdit_textEdited(QString s )
 	m_filterModel->setFilterRegExp( s );
 }
 
+/// event to be called when the user displays a new page on the browser
+/// it will update the title of the dock window, and update the lru with
+/// the new status
 void HelpViewerImpl::on_helpBrowser_sourceChanged(QUrl u)
 {
-	//qDebug( "Showing page %s", qPrintable(u.path() ) );
+	updateWindowTitle();
+	
 	if (m_classesLRU)
 		m_classesLRU->touchItem( u.path() );
 }
@@ -147,9 +186,14 @@ void HelpViewerImpl::on_helpBrowser_sourceChanged(QUrl u)
 /// The function will also set the focus to the indexEdit.
 void HelpViewerImpl::on_mainTab_currentChanged(int index)
 {
+	updateWindowTitle();
+	
 	// handle only when the index tab is showed
 	if (index == 1)
+	{
+		helpBrowser->setFocus();
 		return;
+	}
 		
 	indexEdit->setFocus();
 	indexEdit->activateWindow();
@@ -183,4 +227,29 @@ void HelpViewerImpl::on_indexListView_activated(QModelIndex index)
 {
 	mainTab->setCurrentIndex( 1 );
 	helpBrowser->setSource( QUrl(index.data(Qt::StatusTipRole).toString() ) );
+}
+
+void HelpViewerImpl::on_indexEdit_returnPressed()
+{
+	QModelIndex index = indexListView->currentIndex();
+	
+	if (!index.isValid())
+		return;
+
+	mainTab->setCurrentIndex( 1 );
+	helpBrowser->setSource( QUrl( index.data(Qt::StatusTipRole).toString() ) );
+}
+
+void HelpViewerImpl::updateWindowTitle()
+{
+	QString s = tr("Help Browser");
+	switch (mainTab->currentIndex())
+	{
+		case 0:
+			m_dock->setWindowTitle( s );
+			break;
+		case 1:
+			m_dock->setWindowTitle( s + " - " + helpBrowser->documentTitle() );
+			break;
+	}
 }

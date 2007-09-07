@@ -24,19 +24,26 @@ class HelpViewerImpl : public QObject, public Ui::helpViewerForm
 Q_OBJECT
 public:
 	HelpViewerImpl( QWidget * parent = 0 );
+
+protected:
+	bool eventFilter(QObject *obj, QEvent *event);
+
 private slots:
+	void on_indexEdit_returnPressed();
 	void on_indexListView_activated(QModelIndex index);
 	void on_helpSuggestions_linkActivated(QString link);
 	void on_popularPages_linkActivated(QString link);
 	void on_mainTab_currentChanged(int index);
 	void on_helpBrowser_sourceChanged(QUrl );
 	void on_indexEdit_textEdited(QString );
+	void updateWindowTitle();
 
 public slots:
 	void toggleDock();
 	void showContents();
 	void showPage( QString page );
 	void loadFile();
+
 	
 private:
 	QWidget		*m_dock_widget;
