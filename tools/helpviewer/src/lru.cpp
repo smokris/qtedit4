@@ -11,11 +11,11 @@ LRU::LRU()
 void LRU::touchItem( QString name )
 {
 	bool found = false;
-	int location = 0;
+	//int location = 0;
 	
 	// search for the item
 	LRU_List::iterator i;
-	for (i = items.begin(); i != items.end(); ++i)
+	for (i = items.begin(); i != items.end(); i++)
 	{
 		if ((*i).name == name)
 		{
@@ -24,18 +24,25 @@ void LRU::touchItem( QString name )
 			updateItemLocation( i );
 			break;
 		}
-		location++;
 	}
+	
 	
 	// if not found, just push it to the back
 	if (!found)
 	{
+
 		LRU_item item;
 		item.name = name;
 		item.age = 1;
 		item.value = 1;
 		items.push_back(item);
+		
+		// increase the age of all other items
+		for ( i = items.begin(); i != items.end(); i++)
+			(*i).age++;
 	}
+	
+	//print_list();
 }
 
 LRU_List LRU::getTop( int n )
@@ -60,27 +67,34 @@ void LRU::print_list()
 	qDebug("list begin");
 	for (i = items.begin(); i != items.end(); ++i)
 	{
-		qDebug( "\t%s - %d hits", qPrintable((*i).name), (*i).value );
+		qDebug( "\t%s - %d hits, age=%d", qPrintable((*i).name), (*i).value, (*i).age );
 	}
 	qDebug("list end");
 }
 
 void LRU::updateItemLocation( LRU_List::iterator i )
 {
-	LRU_List::iterator p = i - 1;
-	LRU_item item = (*p);
-	while ( ((*i).value >= (*p).value) && (i != items.begin()) )
+	
+	LRU_List::iterator	p;
+	LRU_item		item;
+
+	while (i != items.begin()) 
 	{
-		/*
-		if ( (*p).age > ( (*i).age ) )
-			continue;*/
-		item = (*p);
+		p = i - 1;
 		
+		// easier to maintain this inside the loop that
+		// in the condition of the loop, i know sad programming :)
+		if ( (*i).value < (*p).value )
+			break;
+		else if ( (*i).value == (*p).value )
+			if ( (*i).age >= (*p).age )
+				break;
+		
+		// do the dirty job
+		item = (*p);
 		i = items.erase(p);
 		i = items.insert( i+1, item );
-		print_list();
-
-		p = i - 1;
+		i --;
 	}
 }
 
