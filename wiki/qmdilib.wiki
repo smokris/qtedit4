@@ -18,7 +18,7 @@ but other compilers should be able to compile this library
 [http://qtedit4.googlecode.com/svn/tools/qmdilib/doc/mdi-tab-3.jpg http://qt-apps.org/CONTENT/content-m2/m61365-2.png]
 [http://qtedit4.googlecode.com/svn/tools/qmdilib/doc/qmdilib_basic_view.png http://qt-apps.org/CONTENT/content-m3/m61365-3.png]
 
-More images are available on the [SVN http://qtedit4.googlecode.com/svn/tools/qmdilib/doc/]
+More images are available on the [http://qtedit4.googlecode.com/svn/tools/qmdilib/doc/ SVN ]
 
 QtApps home page:
 http://qt-apps.org/content/show.php/qmdilib?content=61365
