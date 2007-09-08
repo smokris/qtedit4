@@ -14,6 +14,15 @@ project. It is known to work on Windows and Linux, and there is no reason why it
 should not work on other platforms supported by Qt4. Currently only gcc is tested,
 but other compilers should be able to compile this library
 
+http://qt-apps.org/CONTENT/content-m1/m61365-1.png
+http://qt-apps.org/CONTENT/content-m2/m61365-2.png
+http://qt-apps.org/CONTENT/content-m3/m61365-3.png
+
+mdi-tab-2.jpg  
+mdi-tab-3.jpg  
+qmdilib_basic_view.png  
+
+
 = Changelog =
 0.0.4 - 29 Jun 2007 - Diego Iastrubni
  * Documentation re-created using doxygen 1.4.7
