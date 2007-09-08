@@ -21,7 +21,7 @@ public:
 	~dcfModel();
  
 	QModelIndex index( int row, int col, const QModelIndex &parent = QModelIndex() ) const;
-	QModelIndex parent( const QModelIndex & child ) const;
+	QModelIndex parent( const QModelIndex & ) const;
 	int rowCount( const QModelIndex &parent = QModelIndex() ) const;
 	int columnCount( const QModelIndex &parent = QModelIndex() ) const;
 	QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const;

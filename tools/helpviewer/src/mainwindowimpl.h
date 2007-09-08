@@ -11,9 +11,6 @@
 #include "ui_mainwindow.h"
 #include "helpviewerimpl.h"
 
-//using namespace 
-class HelpViewerImpl;
-	
 class MainWindowImpl : public QMainWindow, public Ui::MainWindow
 {
 Q_OBJECT

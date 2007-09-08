@@ -29,12 +29,9 @@ QModelIndex dcfModel::index( int row, int col, const QModelIndex &parent ) const
 	parent.data();
 }
 
-QModelIndex dcfModel::parent( const QModelIndex &child ) const
+QModelIndex dcfModel::parent( const QModelIndex & ) const
 {
 	return QModelIndex();
-
-	// shut up gcc warnings
-	child.data();
 }
 
 int dcfModel::rowCount( const QModelIndex &parent ) const
@@ -64,10 +61,14 @@ QVariant dcfModel::data( const QModelIndex &index, int roles ) const
 	if (index.row() >= m_dcf->sections.count())
 		return QVariant();
 
+	dcfSection s = m_dcf->sections[index.row()];
+	
 	if (roles == Qt::DisplayRole)
-		return m_dcf->sections[index.row()].title;
+		return s.title;
 	else if (roles == Qt::StatusTipRole)
-		return m_dcf->sections[index.row()].reference;
+		return s.reference;
+	else if (roles == Qt::EditRole)
+		return s.reference;
 	else
 		return QVariant();
 }

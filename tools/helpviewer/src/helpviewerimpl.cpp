@@ -15,6 +15,7 @@
 #include <QSortFilterProxyModel>
 #include <QTimer>
 #include <QKeyEvent>
+#include <QCompleter>
 
 #include <QDebug>
 
@@ -24,7 +25,7 @@
 
 /// Default constructor
 /// Will create the main GUI, and issue the connection of the slots
-/// (slots are not autoconnected, since HelpViewerImpl is not a QWidget)
+/// (slots are not autoconnected, since HelpViewerImpl is not a QWidget).
 ///
 /// The constructor will also add some defaults to the LRU
 ///	* qabstractbutton.h" );
@@ -33,6 +34,8 @@
 ///	* qstring.h
 ///	* qwidget.h
 ///
+/// The default size of the dock widget will be 1/6th of the parent's width
+/// if it has a parent. 
 HelpViewerImpl::HelpViewerImpl( QWidget * parent ) 
 	: QObject(parent)
 {
@@ -48,10 +51,12 @@ HelpViewerImpl::HelpViewerImpl( QWidget * parent )
 	connect( helpSuggestions, SIGNAL(linkActivated(QString)), this, SLOT(on_helpSuggestions_linkActivated(QString)));
 	connect( popularPages, SIGNAL(linkActivated(QString)), this, SLOT(on_popularPages_linkActivated(QString)));
 	connect( indexListView, SIGNAL(activated(QModelIndex )), this, SLOT(on_indexListView_activated(QModelIndex)));
-	connect( indexEdit, SIGNAL(returnPressed()), this, SLOT(on_indexEdit_returnPressed()) );
-	
+	connect( indexEdit, SIGNAL(returnPressed()), this, SLOT(on_indexEdit_returnPressed()));
+	connect( locationBar, SIGNAL(returnPressed()), this, SLOT(on_locationBar_returnPressed()));
+
 	m_dock->setWidget( m_dock_widget );
-	m_dock->resize( parent->width() / 6, parent->height() );
+	if (parent)
+		m_dock->resize( parent->width() / 6, parent->height() );
 	updateWindowTitle();
 	
 	helpBrowser->setSearchPaths( QStringList( QLibraryInfo::location ( QLibraryInfo::DocumentationPath ) + "/html/" ) );
@@ -72,7 +77,7 @@ HelpViewerImpl::HelpViewerImpl( QWidget * parent )
 		m_classesLRU->touchItem( "qstring.html" );
 		m_classesLRU->touchItem( "qwidget.html" );
 	}
-	m_showMaxTop = 4;
+	m_showMaxTop = 5;
 	updatePopularLinks();
 }
 
@@ -147,10 +152,21 @@ void HelpViewerImpl::loadFile()
 	//m_dcfFile->loadFile( QLibraryInfo::location(QLibraryInfo::DocumentationPath) + "/html/qmake.dcf" );
 	
 	m_dcfModel = new dcfModel( m_dcfFile, indexListView );
+
+	// filter for searching classes
 	m_filterModel = new QSortFilterProxyModel(this);
 	m_filterModel->setSourceModel(m_dcfModel);
 	m_filterModel->setFilterCaseSensitivity( Qt::CaseInsensitive );
 	indexListView->setModel( m_filterModel );
+
+	// completer for location bar
+	m_locationCompleter = new QCompleter( this );
+	m_locationCompleter->setModel( m_dcfModel );
+	m_locationCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+	//m_locationCompleter->setCompletionMode( QCompleter::InlineCompletion );
+	m_locationCompleter->setCompletionMode( QCompleter::PopupCompletion );
+	locationBar->setCompleter( m_locationCompleter );
+	
 }
 
 /// opens a page on the help browser. this functino does not try to detect if
@@ -177,6 +193,8 @@ void HelpViewerImpl::on_helpBrowser_sourceChanged(QUrl u)
 	
 	if (m_classesLRU)
 		m_classesLRU->touchItem( u.path() );
+	
+	locationBar->setText( u.path() );
 }
 
 /// Update the popular pages link.
@@ -226,9 +244,15 @@ void HelpViewerImpl::on_indexEdit_returnPressed()
 	
 	if (!index.isValid())
 		return;
-
+	
 	mainTab->setCurrentIndex( 1 );
 	helpBrowser->setSource( QUrl( index.data(Qt::StatusTipRole).toString() ) );
+}
+
+void HelpViewerImpl::on_locationBar_returnPressed()
+{
+	helpBrowser->setSource( locationBar->text() );
+	helpBrowser->setFocus();
 }
 
 void HelpViewerImpl::updateWindowTitle()
@@ -247,7 +271,7 @@ void HelpViewerImpl::updateWindowTitle()
 
 void HelpViewerImpl::updatePopularLinks()
 {
-	QString s = tr("Popular pages (based on previous searches)") + "<ul>";
+	QString s = tr("Popular pages (based on previous searches):") + "<ul>";
 	HelpViewer::LRU_List l = m_classesLRU->getTop(m_showMaxTop);
 	HelpViewer::LRU_List::iterator i;
 

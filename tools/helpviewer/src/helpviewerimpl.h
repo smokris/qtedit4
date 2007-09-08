@@ -12,10 +12,12 @@
 #include "ui_helpviewer.h"
 #include "lru.h"
 
-//using HelpViewer::LRU;
+using HelpViewer::LRU;
 
+class QCompleter;
 class QDockWidget;
 class QSortFilterProxyModel;
+	
 class dcfFile;
 class dcfModel;
 
@@ -29,6 +31,7 @@ protected:
 	bool eventFilter(QObject *obj, QEvent *event);
 
 private slots:
+	void on_locationBar_returnPressed();
 	void on_indexEdit_returnPressed();
 	void on_indexListView_activated(QModelIndex index);
 	void on_helpSuggestions_linkActivated(QString link);
@@ -56,6 +59,7 @@ private:
 	QSortFilterProxyModel *m_filterModel;
 	HelpViewer::LRU	*m_classesLRU;
 	int		m_showMaxTop;
+	QCompleter	*m_locationCompleter;
 };
 
 #endif
