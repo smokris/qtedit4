@@ -23,7 +23,7 @@ struct dcfSection
 {
 	QString reference;
 	QString title;
-	QString keywordRef;	
+	QString keywordRef;
 	QString keywordName;
 	dcfFile	*file;
 };
@@ -48,6 +48,7 @@ public:
 	void loadFile( QString fileName );
 	void loadDocument( QDomDocument doc );
 	void loadSection( QDomNode node );
+	bool containsPage( QString s );
 
 public slots:
 	void fileLoaded();

@@ -49,8 +49,10 @@ public slots:
 	void toggleDock();
 	void showContents();
 	void showPage( QString page );
+	bool displayKeyword( QString s );
+	
+private slots:
 	void loadFile();
-
 	
 private:
 	QWidget		*m_dock_widget;

@@ -117,6 +117,16 @@ void dcfFile::loadSection( QDomNode node )
 	}
 }
 
+bool dcfFile::containsPage( QString s )
+{
+	foreach( dcfSection section, sections )
+	{
+		if (section.reference == s)
+			return true;
+	}
+	return false;
+}
+
 void dcfFile::fileLoaded()
 {
 	delete loadingThread;

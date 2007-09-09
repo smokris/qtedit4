@@ -179,6 +179,23 @@ void HelpViewerImpl::showPage( QString page )
 		helpBrowser->setSource( QUrl(page) );
 }
 
+bool HelpViewerImpl::displayKeyword( QString s )
+{
+	s = s.toLower() + ".html";
+	if (m_dcfFile->containsPage(s))
+	{
+		helpBrowser->setSource( QUrl(s) );
+
+		if (!m_dock->isVisible())
+			toggleDock();
+		mainTab->setCurrentIndex( 1 );
+		helpBrowser->setFocus();
+		m_dock->activateWindow();
+		return true;
+	}
+	return false;
+}
+
 /// update the filter proxy when the user presses the keyboard and starts searching something
 void HelpViewerImpl::on_indexEdit_textEdited(QString s )
 {
@@ -258,7 +275,6 @@ void HelpViewerImpl::on_locationBar_returnPressed()
 
 void HelpViewerImpl::on_btnShowPage_clicked(bool b)
 {
-	// TODO
 	locationBar->setVisible( b );
 	if (b)
 	{
