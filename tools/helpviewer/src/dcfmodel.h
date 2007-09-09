@@ -26,6 +26,9 @@ public:
 	int columnCount( const QModelIndex &parent = QModelIndex() ) const;
 	QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const;
 	
+public slots:
+	void updateDCFData();
+	
 private:
 	dcfFile *m_dcf;
 };

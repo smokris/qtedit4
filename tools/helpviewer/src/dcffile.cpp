@@ -12,6 +12,41 @@
 #include <QFile>
 #include <QString>
 
+//
+dcfFileLoadThread::dcfFileLoadThread( class dcfFile *f, QString fileName  )
+{
+	m_f = f;
+	m_fileName = fileName;
+}
+
+void dcfFileLoadThread::run()
+{
+	if (!m_f)
+		return;
+	
+	QDomDocument doc("language");
+	
+	QFile file(m_fileName);
+	if (!file.open(QIODevice::ReadOnly))
+	{
+		qDebug( "%s %d : Could not open %s", __FILE__, __LINE__, qPrintable(m_fileName) );
+		return;
+	}
+
+	//QString s = file.readAll();
+	//if (!doc.setContent(s))
+	if (!doc.setContent(&file))
+	{
+		file.close();
+		qDebug( "%s %d : Could not open %s", __FILE__, __LINE__, qPrintable(m_fileName) );
+		return;
+	}
+	file.close();
+
+	m_f->loadDocument( doc );
+}
+
+//
 dcfFile::dcfFile(  )
 {
 	
@@ -19,6 +54,13 @@ dcfFile::dcfFile(  )
 
 void dcfFile::loadFile( QString  fileName )
 {
+#if 1
+	loadingThread = new dcfFileLoadThread( this, fileName );
+	connect( loadingThread, SIGNAL(finished()), this, SLOT(fileLoaded()));
+	loadingThread->start();
+#else
+	//qDebug("load file start");
+
 	QDomDocument doc("language");
 	QFile file(fileName);
 	if (!file.open(QIODevice::ReadOnly))
@@ -27,63 +69,41 @@ void dcfFile::loadFile( QString  fileName )
 		return;
 	}
 
+	//QString s = file.readAll();
+	//qDebug("load file - setting contents");
 	if (!doc.setContent(&file))
+	//if (!doc.setContent(s))
 	{
 		file.close();
-		qDebug( "%s %d : Could not open %s", __FILE__, __LINE__, qPrintable(fileName) );
+		qDebug( "%s %d : Invalid XML %s", __FILE__, __LINE__, qPrintable(fileName) );
 		return;
 	}
+	//qDebug("load file end");
 	file.close();
 	
 	loadDocument( doc );
+	emit newContentAvaialable();
+#endif
 }
 
 void dcfFile::loadDocument( QDomDocument doc )
 {
-#if 0
-	QDomNodeList list, l, l2;
-	QDomNode n;
+	QDomNode dcf_head;
 
-	list		= doc.elementsByTagName("DCF");
-	n		= list.item(0);
-	reference	= n.attributes().namedItem("ref").nodeValue();
-	icon		= n.attributes().namedItem("icon").nodeValue();
-	imageDir	= n.attributes().namedItem("imagedir").nodeValue();
-	title		= n.attributes().namedItem("title").nodeValue();
-
-	list = doc.elementsByTagName("section");
-	int size = list.size();
-	for( int i=0; i<size; i++ )
-	{
-		dcfSection section;
-		n = list.item(i);
-		section.reference	= n.attributes().namedItem("ref").nodeValue();
-		section.title		= n.attributes().namedItem("title").nodeValue();
-		section.file		= this;
-		
-		//qDebug() << "new section" << section.reference << ":" << section.title;
-		sections << section;
-	}
-#else
-	QDomNodeList list, l, l2;
-	QDomNode dcf_head,n,n2;
-
-	list		= doc.elementsByTagName("DCF");
-	dcf_head	= list.item(0);
-	
-	n		= dcf_head.childNodes().item(0);
-	if (n.attributes().namedItem("title").nodeValue() != "Classes" )
-	{
-		qDebug("This dcf file does not denote the classes documentation");
-		return;
-	}
-		
+	dcf_head	= doc.elementsByTagName("DCF").item(0);
 	reference	= dcf_head.attributes().namedItem("ref").nodeValue();
 	icon		= dcf_head.attributes().namedItem("icon").nodeValue();
 	imageDir	= dcf_head.attributes().namedItem("imagedir").nodeValue();
 	title		= dcf_head.attributes().namedItem("title").nodeValue();
 
-	n2		= 	n.firstChildElement("section");
+	for( uint i=0; i< dcf_head.childNodes().length(); i++ )
+		loadSection( dcf_head.childNodes().item(i) );
+}
+
+void dcfFile::loadSection( QDomNode node )
+{
+	QDomNode  n2 = node.firstChildElement("section");
+	
 	while (!n2.isNull())
 	{
 		dcfSection section;
@@ -93,8 +113,13 @@ void dcfFile::loadDocument( QDomDocument doc )
 		
 		//qDebug() << "new section" << section.reference << ":" << section.title;
 		sections << section;
-
 		n2 = n2.nextSiblingElement("section");
 	}
-#endif
+}
+
+void dcfFile::fileLoaded()
+{
+	delete loadingThread;
+	loadingThread = NULL;
+	emit newContentAvaialable();
 }

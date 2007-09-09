@@ -14,6 +14,7 @@ dcfModel::dcfModel(dcfFile *dcf, QObject *parent)
 	:QAbstractItemModel(parent)
 {
 	m_dcf = dcf;
+	connect(dcf, SIGNAL(newContentAvaialable()), this, SLOT(updateDCFData()) );
 }
 
 dcfModel::~dcfModel()
@@ -36,11 +37,14 @@ QModelIndex dcfModel::parent( const QModelIndex & ) const
 
 int dcfModel::rowCount( const QModelIndex &parent ) const
 {
+	int i;
 	if (m_dcf == NULL)
-		return 0;
+		i = 0;
 	else
-		return m_dcf->sections.count();
+		i = m_dcf->sections.count();
 	
+	//qDebug("using %d items", i );
+	return i;
 	// shut up gcc warnings
 	parent.row();
 }
@@ -71,4 +75,9 @@ QVariant dcfModel::data( const QModelIndex &index, int roles ) const
 		return s.reference;
 	else
 		return QVariant();
+}
+
+void dcfModel::updateDCFData()
+{
+	reset();
 }

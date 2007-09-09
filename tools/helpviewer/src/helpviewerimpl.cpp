@@ -53,6 +53,7 @@ HelpViewerImpl::HelpViewerImpl( QWidget * parent )
 	connect( indexListView, SIGNAL(activated(QModelIndex )), this, SLOT(on_indexListView_activated(QModelIndex)));
 	connect( indexEdit, SIGNAL(returnPressed()), this, SLOT(on_indexEdit_returnPressed()));
 	connect( locationBar, SIGNAL(returnPressed()), this, SLOT(on_locationBar_returnPressed()));
+	connect( btnShowPage, SIGNAL(clicked(bool)), this, SLOT(on_btnShowPage_clicked(bool)));
 
 	m_dock->setWidget( m_dock_widget );
 	if (parent)
@@ -155,18 +156,17 @@ void HelpViewerImpl::loadFile()
 
 	// filter for searching classes
 	m_filterModel = new QSortFilterProxyModel(this);
-	m_filterModel->setSourceModel(m_dcfModel);
 	m_filterModel->setFilterCaseSensitivity( Qt::CaseInsensitive );
+	m_filterModel->setSourceModel(m_dcfModel);
 	indexListView->setModel( m_filterModel );
 
 	// completer for location bar
 	m_locationCompleter = new QCompleter( this );
-	m_locationCompleter->setModel( m_dcfModel );
 	m_locationCompleter->setCaseSensitivity(Qt::CaseInsensitive);
 	//m_locationCompleter->setCompletionMode( QCompleter::InlineCompletion );
 	m_locationCompleter->setCompletionMode( QCompleter::PopupCompletion );
+	m_locationCompleter->setModel( m_dcfModel );
 	locationBar->setCompleter( m_locationCompleter );
-	
 }
 
 /// opens a page on the help browser. this functino does not try to detect if
@@ -174,6 +174,7 @@ void HelpViewerImpl::loadFile()
 void HelpViewerImpl::showPage( QString page )
 {
 	toggleDock();
+	
 	if (m_dock->isVisible())
 		helpBrowser->setSource( QUrl(page) );
 }
@@ -253,6 +254,17 @@ void HelpViewerImpl::on_locationBar_returnPressed()
 {
 	helpBrowser->setSource( locationBar->text() );
 	helpBrowser->setFocus();
+}
+
+void HelpViewerImpl::on_btnShowPage_clicked(bool b)
+{
+	// TODO
+	locationBar->setVisible( b );
+	if (b)
+	{
+		locationBar->setFocus();
+		locationBar->selectAll();
+	}
 }
 
 void HelpViewerImpl::updateWindowTitle()

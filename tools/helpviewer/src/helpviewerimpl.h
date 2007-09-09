@@ -31,6 +31,7 @@ protected:
 	bool eventFilter(QObject *obj, QEvent *event);
 
 private slots:
+	void on_btnShowPage_clicked(bool b);
 	void on_locationBar_returnPressed();
 	void on_indexEdit_returnPressed();
 	void on_indexListView_activated(QModelIndex index);

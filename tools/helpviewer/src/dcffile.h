@@ -8,10 +8,13 @@
 #ifndef DCFFILE_H
 #define DCFFILE_H
 
+#include <QObject>
 #include <QList>
 #include <QString>
+#include <QThread>
 
 class QDomDocument;
+class QDomNode;
 class QFile;
 class dcfFile;
 class dcfModel;
@@ -25,13 +28,32 @@ struct dcfSection
 	dcfFile	*file;
 };
 
-class dcfFile
+class dcfFile;
+
+class dcfFileLoadThread: public QThread
 {
 public:
-	dcfFile();
+	dcfFileLoadThread( class dcfFile *f, QString fileName );
+	virtual void run();
+private:
+	dcfFile *m_f;
+	QString m_fileName;
+};
 
+class dcfFile: public QObject
+{
+	Q_OBJECT
+public:
+	dcfFile();
 	void loadFile( QString fileName );
 	void loadDocument( QDomDocument doc );
+	void loadSection( QDomNode node );
+
+public slots:
+	void fileLoaded();
+	
+signals:
+	void newContentAvaialable();
 	
 private:
 	QString reference;
@@ -39,8 +61,10 @@ private:
 	QString imageDir;
 	QString title;	
 	QList<dcfSection> sections;
+	dcfFileLoadThread *loadingThread;
 
 	class dcfModel friend;
+	class dcfFileLoadThread friend;
 };
 
 #endif
