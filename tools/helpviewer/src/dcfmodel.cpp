@@ -43,7 +43,7 @@ int dcfModel::rowCount( const QModelIndex &parent ) const
 	else
 		i = m_dcf->sections.count();
 	
-	//qDebug("using %d items", i );
+	qDebug("using %d items", i );
 	return i;
 	// shut up gcc warnings
 	parent.row();

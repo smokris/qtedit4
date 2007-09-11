@@ -40,7 +40,6 @@ HelpViewerImpl::HelpViewerImpl( QWidget * parent )
 	: QObject(parent)
 {
 	m_classesLRU = new HelpViewer::LRU;
-
 	m_dock = new QDockWidget;
 	m_dock_widget = new QWidget(m_dock);
 	
@@ -157,6 +156,7 @@ void HelpViewerImpl::loadFile()
 	// filter for searching classes
 	m_filterModel = new QSortFilterProxyModel(this);
 	m_filterModel->setFilterCaseSensitivity( Qt::CaseInsensitive );
+	//m_filterModel->setDynamicSortFilter( true );
 	m_filterModel->setSourceModel(m_dcfModel);
 	indexListView->setModel( m_filterModel );
 

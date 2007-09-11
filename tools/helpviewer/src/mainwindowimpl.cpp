@@ -24,7 +24,7 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 "   the widget is too small, hide some actions on the main toobar [done, URL bar is displayed on demand]\n"
 " * main tab should list the last used pages (with sane defaults for first uses) [done]\n"
 " * when the focus is on the lineEdit (Index tab), and you press down, the key press should be passed to the list box  [done]\n"
-" * when typing an \"url\" in the Browser, completion is needed [done] \n"
+" * when typing an \"url\" in the Browser, completion is needed [done]\n"
 " * when pressing F1, the current word should be search in the help [done]\n"
 " * loading the XML file must be done on a separate thread (non blocking GUI) [done]\n\n"
 

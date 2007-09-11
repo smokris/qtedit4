@@ -12,6 +12,9 @@
 #include <QFile>
 #include <QString>
 
+#define new_dcf_load
+#define async_file_loading
+
 //
 dcfFileLoadThread::dcfFileLoadThread( class dcfFile *f, QString fileName  )
 {
@@ -54,7 +57,7 @@ dcfFile::dcfFile(  )
 
 void dcfFile::loadFile( QString  fileName )
 {
-#if 1
+#ifdef async_file_loading
 	loadingThread = new dcfFileLoadThread( this, fileName );
 	connect( loadingThread, SIGNAL(finished()), this, SLOT(fileLoaded()));
 	loadingThread->start();
@@ -96,13 +99,52 @@ void dcfFile::loadDocument( QDomDocument doc )
 	imageDir	= dcf_head.attributes().namedItem("imagedir").nodeValue();
 	title		= dcf_head.attributes().namedItem("title").nodeValue();
 
+#ifdef new_dcf_load
+	loadSection( dcf_head );
+#else
 	for( uint i=0; i< dcf_head.childNodes().length(); i++ )
 		loadSection( dcf_head.childNodes().item(i) );
+#endif
 }
 
+#ifdef new_dcf_load
+void dcfFile::loadSection( QDomNode node )
+{
+	QDomNode n = node.firstChildElement("section");
+	QDomNode n2;
+	dcfSection section;
+	
+	while (!n.isNull())
+	{
+		section.reference	= n.attributes().namedItem("ref").nodeValue();
+		section.title		= n.attributes().namedItem("title").nodeValue();
+		section.file		= this;
+		//sections << section;
+		//qDebug() << "new section" << section.reference << ":" << section.title;
+
+		n2 = n.firstChildElement("keyword");
+		while (!n2.isNull())
+		{
+			section.reference	= n2.attributes().namedItem("ref").nodeValue();
+			section.title		= n2.toElement().text();
+			section.file		= this;
+			
+			if ( (!section.title.isEmpty()) && (!section.reference.isEmpty()) )
+				sections << section;
+			//else
+				//qDebug() << "new keyword" << section.reference << ":" << section.title;
+			n2 = n2.nextSiblingElement("keyword");
+		}
+
+		loadSection( n );
+		n = n.nextSiblingElement("section");
+	}
+}
+#else
 void dcfFile::loadSection( QDomNode node )
 {
 	QDomNode  n2 = node.firstChildElement("section");
+	QDomNode n;
 	
 	while (!n2.isNull())
 	{
@@ -110,12 +152,12 @@ void dcfFile::loadSection( QDomNode node )
 		section.reference	= n2.attributes().namedItem("ref").nodeValue();
 		section.title		= n2.attributes().namedItem("title").nodeValue();
 		section.file		= this;
-		
-		//qDebug() << "new section" << section.reference << ":" << section.title;
 		sections << section;
+		//qDebug() << "new section" << section.reference << ":" << section.title;
 		n2 = n2.nextSiblingElement("section");
 	}
 }
+#endif
 
 bool dcfFile::containsPage( QString s )
 {
