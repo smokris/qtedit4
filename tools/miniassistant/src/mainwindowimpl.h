@@ -9,7 +9,7 @@
 #define MAINWINDOWIMPL_H
 
 #include "ui_mainwindow.h"
-#include "helpviewerimpl.h"
+#include "miniassistant.h"
 
 class MainWindowImpl : public QMainWindow, public Ui::MainWindow
 {

@@ -1,6 +1,6 @@
 /**
- * \file helpviewerimpl.cpp
- * \brief Implementation of the help viewer object
+ * \file miniassistant.cpp
+ * \brief Implementation of the MiniAssistant class
  * \author Diego Iastrubni (elcuco@kde.org)
  * License LGPL
  */
@@ -22,8 +22,8 @@
 #include <QTextBlock>
 #include <QRegExp>
 
+#include "miniassistant.h"
 #include "lru.h"
-#include "helpviewerimpl.h"
 #include "dcffile.h"
 #include "dcfmodel.h"
 

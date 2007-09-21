@@ -5,16 +5,16 @@ DESTDIR += bin
 OBJECTS_DIR += build
 MOC_DIR += build
 UI_DIR += build
-FORMS += ui/mainwindow.ui ui/helpviewer.ui
+FORMS += ui/mainwindow.ui ui/miniassistant.ui
 HEADERS += src/mainwindowimpl.h \
- src/helpviewerimpl.h \
+ src/miniassistant.h \
  src/dcffile.h \
  src/dcfmodel.h \
  src/lru.h
 SOURCES += src/mainwindowimpl.cpp \
  src/main.cpp \
- src/helpviewerimpl.cpp \
+ src/miniassistant.cpp \
  src/dcffile.cpp \
  src/dcfmodel.cpp \
  src/lru.cpp
-RESOURCES += helpviewer.qrc
+RESOURCES += miniassistant.qrc

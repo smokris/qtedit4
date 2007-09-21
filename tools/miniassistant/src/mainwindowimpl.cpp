@@ -9,7 +9,7 @@
 #include <QLibraryInfo>
 
 #include "mainwindowimpl.h"
-#include "helpviewerimpl.h"
+#include "miniassistant.h"
 
 /// constuctor
 MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f) 
@@ -83,7 +83,7 @@ void MainWindowImpl::on_textEdit_cursorPositionChanged()
 	guessTimer = startTimer( 2000 );
 }
 
-void MainWindowImpl::timerEvent(QTimerEvent *event)
+void MainWindowImpl::timerEvent(QTimerEvent *)
 {
 	killTimer( guessTimer );
 	guessTimer = 0;

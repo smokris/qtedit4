@@ -1,6 +1,6 @@
 /**
- * \file helpviewerimpl.h
- * \brief Definition of the help viewer object
+ * \file miniassistant.h
+ * \brief Definition of the MiniAssistant class
  * \author Diego Iastrubni (elcuco@kde.org)
  * License LGPL
  */
@@ -9,7 +9,7 @@
 #define HELPVIEWERIMPL_H
 
 #include <QObject>
-#include "ui_helpviewer.h"
+#include "ui_miniassistant.h"
 
 class QCompleter;
 class QDockWidget;
