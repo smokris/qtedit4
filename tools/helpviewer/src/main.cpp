@@ -1,6 +1,6 @@
 /**
- * \file mainwindowimpl.h
- * \brief Definition of the main window
+ * \file main.cpp
+ * \brief Application entry
  * \author Diego Iastrubni (elcuco@kde.org)
  * License LGPL
  */

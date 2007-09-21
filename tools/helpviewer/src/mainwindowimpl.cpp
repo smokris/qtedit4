@@ -26,10 +26,10 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 " * when the focus is on the lineEdit (Index tab), and you press down, the key press should be passed to the list box  [done]\n"
 " * when typing an \"url\" in the Browser, completion is needed [done]\n"
 " * when pressing F1, the current word should be search in the help [done]\n"
-" * loading the XML file must be done on a separate thread (non blocking GUI) [done]\n\n"
+" * loading the XML file must be done on a separate thread (non blocking GUI) [done]\n"
+" * all the code must be in a namespace [DONE]\n\n"
 
 " * code cleanup + documentation [WIP]\n"
-" * all the code must be in a namespace [WIP]\n"
 " * main tab should be smart enough to give you examples of helps (like VS does)\n"
 " * Browser tab should have a search command\n"
 " * command for showing the help browser should toggle with context (hidden,showed)\n"

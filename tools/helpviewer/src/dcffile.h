@@ -16,10 +16,13 @@
 class QDomDocument;
 class QDomNode;
 class QFile;
+
+namespace HelpViewer {
+
 class dcfFile;
 class dcfModel;
 
-struct dcfSection
+struct dcfReference
 {
 	QString reference;
 	QString title;
@@ -28,15 +31,13 @@ struct dcfSection
 	dcfFile	*file;
 };
 
-class dcfFile;
-
 class dcfFileLoadThread: public QThread
 {
 public:
 	dcfFileLoadThread( class dcfFile *f, QString fileName );
 	virtual void run();
 private:
-	dcfFile *m_f;
+	dcfFile *m_file;
 	QString m_fileName;
 };
 
@@ -48,7 +49,7 @@ public:
 	void loadFile( QString fileName );
 	void loadDocument( QDomDocument doc );
 	void loadSection( QDomNode node );
-	bool containsPage( QString s );
+	bool containsPage( QString pageName );
 
 public slots:
 	void fileLoaded();
@@ -61,11 +62,12 @@ private:
 	QString icon;
 	QString imageDir;
 	QString title;	
-	QList<dcfSection> sections;
+	QList<dcfReference> references;
 	dcfFileLoadThread *loadingThread;
 
 	class dcfModel friend;
 	class dcfFileLoadThread friend;
 };
 
+} // end of namespace
 #endif

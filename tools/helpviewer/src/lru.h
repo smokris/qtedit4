@@ -1,3 +1,10 @@
+/**
+ * \file lru.h
+ * \brief Definition of the lru class used in the help browser
+ * \author Diego Iastrubni (elcuco@kde.org)
+ * License LGPL
+ */
+
 #ifndef LRU_H
 #define LRU_H
 

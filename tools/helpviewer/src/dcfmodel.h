@@ -1,6 +1,6 @@
 /**
  * \file dcfmodel.h
- * \brief Definition of the dcf model class
+ * \brief Definition of the DCF model class
  * \author Diego Iastrubni (elcuco@kde.org)
  * License LGPL
  */
@@ -10,6 +10,9 @@
 
 #include <QAbstractItemModel>
 
+
+namespace HelpViewer {
+
 class dcfFile;
 
 class dcfModel : public QAbstractItemModel
@@ -18,7 +21,6 @@ class dcfModel : public QAbstractItemModel
 public:
 
 	dcfModel(dcfFile *dcf, QObject *parent = 0 );
-	~dcfModel();
  
 	QModelIndex index( int row, int col, const QModelIndex &parent = QModelIndex() ) const;
 	QModelIndex parent( const QModelIndex & ) const;
@@ -32,4 +34,7 @@ public slots:
 private:
 	dcfFile *m_dcf;
 };
+
+} // end of namespace
+
 #endif
