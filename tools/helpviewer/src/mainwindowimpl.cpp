@@ -6,6 +6,7 @@
  */
 
 #include <QTextCursor>
+#include <QLibraryInfo>
 
 #include "mainwindowimpl.h"
 #include "helpviewerimpl.h"
@@ -14,8 +15,15 @@
 MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f) 
 	: QMainWindow(parent, f)
 {
+	guessTimer = 0;
 	setupUi(this);
-	helpViewer = new HelpViewerImpl(this);
+	miniAssistant = new MiniAssistant(this);
+	miniAssistant->loadFile( QLibraryInfo::location(QLibraryInfo::DocumentationPath) + "/html/qt.dcf" );
+	//miniAssistant->loadFile( QLibraryInfo::location(QLibraryInfo::DocumentationPath) + "/html/assistant.dcf" );
+	//miniAssistant->loadFile( QLibraryInfo::location(QLibraryInfo::DocumentationPath) + "/html/designer.dcf" );
+	//miniAssistant->loadFile( QLibraryInfo::location(QLibraryInfo::DocumentationPath) + "/html/linguist.dcf" );
+	//miniAssistant->loadFile( QLibraryInfo::location(QLibraryInfo::DocumentationPath) + "/html/qmake.dcf" );
+
 	this->textEdit->setText(
 "QString QMainWindow QObject\n\n"
 "Missing functionalty: \n"
@@ -27,12 +35,11 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 " * when typing an \"url\" in the Browser, completion is needed [done]\n"
 " * when pressing F1, the current word should be search in the help [done]\n"
 " * loading the XML file must be done on a separate thread (non blocking GUI) [done]\n"
-" * all the code must be in a namespace [DONE]\n\n"
+" * code cleanup + documentation [done]\n"
+" * all the code must be in a namespace [DONE]\n"
+" * main tab should be smart enough to give you examples of helps (like VS does) [WIP]\n\n"
 
-" * code cleanup + documentation [WIP]\n"
-" * main tab should be smart enough to give you examples of helps (like VS does)\n"
 " * Browser tab should have a search command\n"
-" * command for showing the help browser should toggle with context (hidden,showed)\n"
 ) ;
 }
 
@@ -51,11 +58,34 @@ void MainWindowImpl::on_action_Help_triggered()
 	QTextCursor cursor = textEdit->textCursor();
 	cursor.select(QTextCursor::WordUnderCursor);
 	QString s = cursor.selectedText();
-	helpViewer->displayKeyword( s );
+	miniAssistant->displayKeyword( s );
 }
 
 /// handle a help search event
 void MainWindowImpl::on_action_Seach_Help_triggered()
 {
-	helpViewer->showContents();
+	miniAssistant->showContents();
+}
+
+void MainWindowImpl::on_actionShow_contents_triggered()
+{
+	miniAssistant->showMiniBrowser();
+}
+
+void MainWindowImpl::on_textEdit_cursorPositionChanged()
+{
+	if (guessTimer!=0)
+	{
+		killTimer( guessTimer );
+		//return;
+	}
+		
+	guessTimer = startTimer( 2000 );
+}
+
+void MainWindowImpl::timerEvent(QTimerEvent *event)
+{
+	killTimer( guessTimer );
+	guessTimer = 0;
+	miniAssistant->updateSuggestedLinks( textEdit );
 }

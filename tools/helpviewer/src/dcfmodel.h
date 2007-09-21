@@ -11,7 +11,7 @@
 #include <QAbstractItemModel>
 
 
-namespace HelpViewer {
+namespace MiniAssistantInt {
 
 class dcfFile;
 

@@ -9,15 +9,18 @@
 #include <QDockWidget>
 #include <QApplication>
 #include <QMainWindow>
-#include <QLibraryInfo>
 #include <QStringList>
+#include <QDir>
 #include <QUrl>
 #include <QSortFilterProxyModel>
 #include <QTimer>
 #include <QKeyEvent>
 #include <QCompleter>
 
-#include <QDebug>
+#include <QTextDocument>
+#include <QTextEdit>
+#include <QTextBlock>
+#include <QRegExp>
 
 #include "lru.h"
 #include "helpviewerimpl.h"
@@ -25,7 +28,7 @@
 #include "dcfmodel.h"
 
 /**
-\namespace HelpViewer
+\namespace MiniAssistantInt
 \brief Internal namespace
 
 Internal namepace which ontains all the needed classes
@@ -34,7 +37,7 @@ needed by the help viewer. They are all considered to be
 */
 
 /**
-\class HelpViewerImpl
+\class MiniAssistant
 \brief A mini-assistant to be emmbeded in applications
 
 The mini-assistant is a small widget which will give you 
@@ -50,13 +53,13 @@ classes are classified as internal, and are part of the namespace 'HelpViewer'.
 
 To use this class, all you need to do is create in instace of it
 \code
-helpViewer = new HelpViewerImpl(this);
-helpViewer->showContents();
+mAsistant = new MiniAssistant(this);
+mAsistant->showContents();
 
 // In this example we take the word under a QTextEdit and feed it to the browser
 QTextCursor cursor = textEdit->textCursor();
 cursor.select(QTextCursor::WordUnderCursor);
-helpViewer->displayKeyword( cursor.selectedText() );
+mAsistant->displayKeyword( cursor.selectedText() );
 \endcode
 
 The filtering in the index is done via a timer. Each time a user presses
@@ -66,18 +69,15 @@ the text is filtered and displayed on screen. This way if the user types
 instead of beeing re-generated on every keyboard click. This also makes the 
 GUI more responsive as it gets frozen only maximum times per second.
 
-\todo Class name needs to be modified to MiniAssistant
-\todo currently the dcfFile which is loaded is hardcoded to $QTDIR/doc/html/qt.dcf, make this configurable
-\todo HelpViewer namespace should be modified to MiniAssistantInternal
-
 \see on_indexEditTimer_timeout()
 \see loadFile()
 
 */
 
 /**
-\var HelpViewerImpl::m_showMaxTop
+\var MiniAssistant::m_showMaxTop
 \brief The number or most viewed pages to be displayed
+
 When updating the popular links this parameter defines
 how much items to display (defaults is 5 items).
 
@@ -88,7 +88,7 @@ If you modify this parameter please call updatePopularLinks() manually.
 */
 
 /**
-\var HelpViewerImpl::m_dock_widget
+\var MiniAssistant::m_dock_widget
 \brief The widget seen on the dock widget
 
 This is what you see inside the dock widget. This is a place holder for the GUI, which is 
@@ -98,10 +98,10 @@ designed in the designer. This widget will be inserted into the dock widget.
 */
 
 /**
-\var HelpViewerImpl::m_dock
+\var MiniAssistant::m_dock
 \brief The dock widget used for containing the main help viewer
 
-The HelpViewerImpl is not a widget, it's a class which controlls the main
+The MiniAssistant is not a widget, it's a class which controlls the main
 widget to be displayed o nscreen. This widget is currently a QDockWidget, 
 which is represented by this variable.
 
@@ -111,7 +111,7 @@ The m_dock will contain the m_dock_widget.
 */
 
 /**
-\var HelpViewerImpl::m_locationCompleter
+\var MiniAssistant::m_locationCompleter
 \brief The compltetion for the URL like browsing.
 
 The help browser contains a small input line, for writing manually 
@@ -124,20 +124,19 @@ It uses the model for completition.
 */
 
 /**
-\var HelpViewerImpl::m_indexEditTimer
+\var MiniAssistant::m_indexEditTimer
 \brief Use to help filtering text
 
 When the user presses the keyboard on the indexEdit
 this timer will be triggered. The full documentation 
 can be found in on_indexEdit_textEdited.
 
-\todo remove this variable
-\see on_indexEditTimer_timeout()
+\see timerEvent()
 \see on_indexEdit_textEdited()
 */
 
 /**
-\var HelpViewerImpl::m_filterModel
+\var MiniAssistant::m_filterModel
 \brief Filter the results on the indexListView
 
 When the user wants to filter the list of classes, this class
@@ -147,36 +146,36 @@ will be used to filter the display in the indexListView.
 */
 
 /**
-\var HelpViewerImpl::m_dcfFile
+\var MiniAssistant::m_dcfFile
 \brief The help topics are loaded from this file
 
 This variable contains all the help topics the user can choose to view.
 
 \todo move to a list of dcf files instead of a single dcf file
 \see m_dcfModel
-\see HelpViewer::dcfFile
+\see MiniAssistantInt::dcfFile
 */
 
 /**
-\var HelpViewerImpl::m_dcfModel
+\var MiniAssistant::m_dcfModel
 \brief Display the list of help topics available
 
 This class will display on the list view the available topics.
 
 \todo move to a model which knows how to deal with a list of DCF files
 
-\see HelpViewer::dcfModel
-\see HelpViewer::dcfFile
+\see MiniAssistantInt::dcfModel
+\see MiniAssistantInt::dcfFile
 */
 
 /**
-\var HelpViewerImpl::m_classesLRU
+\var MiniAssistant::m_classesLRU
 \brief The least recently used help pages
 
 This contains the list of recently viewed pages.
 
 \see updatePopularLinks()
-\see HelpViewer::LRU
+\see MiniAssistantInt::LRU
 */
 
 /**
@@ -184,7 +183,7 @@ This contains the list of recently viewed pages.
 \param parent the main window to attach the dock widget to
 
 Will create the main GUI, and issue the connection of the slots
-(slots are not autoconnected, since HelpViewerImpl is not a QWidget).
+(slots are not autoconnected, since MiniAssistant is not a QWidget).
 
 The constructor will also add some defaults to the LRU
 - qabstractbutton.h
@@ -200,51 +199,51 @@ The \b parent parameter is very important, and should be set to the QMainWindow
 in which you want the dock window to be attached. Even tough it defaults to "0"
 you should \b never pass it "0", but a valid QMainWindow (and \b a QWidget)
 */
-HelpViewerImpl::HelpViewerImpl( QWidget * parent ) 
+MiniAssistant::MiniAssistant( QWidget * parent ) 
 	: QObject(parent)
 {
-	m_classesLRU = new HelpViewer::LRU;
+	m_classesLRU = new MiniAssistantInt::LRU;
 	m_dock = new QDockWidget;
 	m_dock_widget = new QWidget(m_dock);
-	m_indexEditTimer = new QTimer;
 	
-	setupUi(m_dock_widget);
-	connect( indexEdit, SIGNAL(textEdited(QString)), this, SLOT(on_indexEdit_textEdited(QString)));
-	connect( helpBrowser, SIGNAL(sourceChanged(QUrl)), this, SLOT(on_helpBrowser_sourceChanged(QUrl)));
-	connect( mainTab, SIGNAL(currentChanged(int)), this, SLOT(on_mainTab_currentChanged(int)));
-	connect( helpSuggestions, SIGNAL(linkActivated(QString)), this, SLOT(on_helpSuggestions_linkActivated(QString)));
-	connect( popularPages, SIGNAL(linkActivated(QString)), this, SLOT(on_popularPages_linkActivated(QString)));
-	connect( indexListView, SIGNAL(activated(QModelIndex )), this, SLOT(on_indexListView_activated(QModelIndex)));
-	connect( indexEdit, SIGNAL(returnPressed()), this, SLOT(on_indexEdit_returnPressed()));
-	connect( locationBar, SIGNAL(returnPressed()), this, SLOT(on_locationBar_returnPressed()));
-	connect( btnShowPage, SIGNAL(clicked(bool)), this, SLOT(on_btnShowPage_clicked(bool)));
-	connect( m_indexEditTimer, SIGNAL(timeout()), this, SLOT(on_indexEditTimer_timeout()));
+	ui.setupUi(m_dock_widget);
+	connect( ui.indexEdit, SIGNAL(textEdited(QString)), this, SLOT(on_indexEdit_textEdited(QString)));
+	connect( ui.helpBrowser, SIGNAL(sourceChanged(QUrl)), this, SLOT(on_helpBrowser_sourceChanged(QUrl)));
+	connect( ui.mainTab, SIGNAL(currentChanged(int)), this, SLOT(on_mainTab_currentChanged(int)));
+	connect( ui.helpSuggestions, SIGNAL(linkActivated(QString)), this, SLOT(on_helpSuggestions_linkActivated(QString)));
+	connect( ui.popularPages, SIGNAL(linkActivated(QString)), this, SLOT(on_popularPages_linkActivated(QString)));
+	connect( ui.indexListView, SIGNAL(activated(QModelIndex )), this, SLOT(on_indexListView_activated(QModelIndex)));
+	connect( ui.indexEdit, SIGNAL(returnPressed()), this, SLOT(on_indexEdit_returnPressed()));
+	connect( ui.locationBar, SIGNAL(returnPressed()), this, SLOT(on_locationBar_returnPressed()));
+	connect( ui.btnShowPage, SIGNAL(clicked(bool)), this, SLOT(on_btnShowPage_clicked(bool)));
 	
 	m_dock->setWidget( m_dock_widget );
 	if (parent)
 		m_dock->resize( parent->width() / 6, parent->height() );
 	updateWindowTitle();
 	
-	helpBrowser->setSearchPaths( QStringList( QLibraryInfo::location ( QLibraryInfo::DocumentationPath ) + "/html/" ) );
-	helpBrowser->setSource( QUrl("index.html") );
-	helpBrowser->zoomOut( 1 );
+	ui.helpBrowser->zoomOut( 1 );
 	
-	indexEdit->installEventFilter( this );
-	indexListView->setAlternatingRowColors( true );
-	locationBar->hide();
-	QTimer::singleShot( 0, this, SLOT(loadFile()));
+	ui.indexEdit->installEventFilter( this );
+	ui.indexListView->setAlternatingRowColors( true );
+	ui.locationBar->hide();
+
+	m_dcfModel = NULL;
+	m_dcfFile = NULL;
+
+	// filter for searching classes
+	m_filterModel = new QSortFilterProxyModel(this);
+	m_filterModel->setFilterCaseSensitivity( Qt::CaseInsensitive );
+	m_filterModel->setDynamicSortFilter( true );
 	
-	// default "recently used" items
-	for( int i=0; i<2; i++ )
-	{
-		m_classesLRU->touchItem( "qabstractbutton.html" );
-		m_classesLRU->touchItem( "qmenubar.html" );
-		m_classesLRU->touchItem( "qtextedit.html" );
-		m_classesLRU->touchItem( "qstring.html" );
-		m_classesLRU->touchItem( "qwidget.html" );
-	}
+	// completer for location bar
+	m_locationCompleter = new QCompleter( this );
+	m_locationCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+	m_locationCompleter->setCompletionMode( QCompleter::PopupCompletion );
+	
 	m_showMaxTop = 5;
-	updatePopularLinks();
+	m_indexEditTimer = -1;
+	m_indexEdit_Timeout = 450; //msec
 }
 
 /**
@@ -254,11 +253,9 @@ Call this function if you want to display of hide the dock window:
  - If called when the help dock is displayed it will hide the help dock window
  - If the dock window is hidden, it will re-parent the dock (if needed) and display the dock window
 
-This function will also focus the first tab and the search bar.
-
 \see on_mainTab_currentChanged
 */
-void HelpViewerImpl::toggleDock()
+void MiniAssistant::toggleDock()
 {
 	if (m_dock->isVisible())
 		m_dock->hide();
@@ -272,23 +269,75 @@ void HelpViewerImpl::toggleDock()
 		}
 		m_dock->show();
 		m_dock->activateWindow();
-		
-		mainTab->setCurrentIndex( 0 );
-		indexEdit->setFocus();
-		indexEdit->activateWindow();
 	}
 }
 
 /**
-\brief Display the help contents, simply loads "index.html"
+\brief Display the help contents
 
-\todo should we remove it?
-\todo make sure that the dock is visible
-\todo load the main document of the DCF file
+This function will toggle the contents viewer, the Index tab:
+ - if the dock is not visible it will display the dock and focus the \b Index tab
+ - if the dock is not visible, then 
+    - if the \b Index tab is displayed, dock will be hidden
+    - if other tab is focused, the focus will shift to the \b Index tab
+    
+\todo refactor this code     
 */
-void HelpViewerImpl::showContents()
+void MiniAssistant::showContents()
 {
-	showPage("index.html");
+	QString s = "file://" + m_dcfFile->getReference();
+	
+	// this is called an educated guess
+	if (s[s.length()-1] == QDir::separator())
+		s += "index.html";
+
+	if (m_dock->isVisible())
+	{
+		if (ui.mainTab->currentIndex() != 0)
+		{
+			ui.helpBrowser->setSource( QUrl(s) );
+			ui.mainTab->setCurrentIndex(0);
+		}
+		else	// hide it
+			toggleDock();
+	}
+	else
+	{	// show it
+		ui.helpBrowser->setSource( QUrl(s) );
+		ui.mainTab->setCurrentIndex(0);
+		on_mainTab_currentChanged( 0 );
+		this->toggleDock();
+	}
+}
+
+/**
+\brief Display the mini browser
+
+This function will toggle the \b Mini \b Browser viewer:
+ - if the dock is not visible it will display the dock and focus the \b Mini \b Browser tab
+ - if the dock is not visible, then 
+    - if the \b Mini \b Browser tab is displayed, the dock will be hidden
+    - if other tab is focused, the focus will shift to the \b Mini \b Browser tab
+    
+\todo refactor this code 
+*/
+void MiniAssistant::showMiniBrowser()
+{
+	if (m_dock->isVisible())
+	{
+		if (ui.mainTab->currentIndex() != 1)
+		{
+			ui.mainTab->setCurrentIndex(1);
+		}
+		else	// hide it
+			toggleDock();
+	}
+	else
+	{	// show it
+		ui.mainTab->setCurrentIndex(1);
+		on_mainTab_currentChanged(1);
+		this->toggleDock();
+	}
 }
 
 /**
@@ -302,12 +351,43 @@ This function will also ensure that the dock is visible.
 
 \see toggleDock
 */
-void HelpViewerImpl::showPage( QString page )
+void MiniAssistant::showPage( QString page )
 {
 	if (!m_dock->isVisible())
 		toggleDock();
 	
-	helpBrowser->setSource( QUrl(page) );
+	ui.helpBrowser->setSource( QUrl(page) );
+}
+
+/**
+\brief Load a DCF file
+\param dcfFileName the dcfFile to be loaded to the Mini Assistant
+
+Load a new DCF to the Mini Assistant. It will reload all
+the pages, and reset the LRU. When the file has been loaded
+a signal will be emitted and a slot will be called
+to update the search path of the help browser.
+
+\see on_dcfFile_loaded()
+*/
+void MiniAssistant::loadFile( QString dcfFileName )
+{
+	if (m_dcfModel)
+		delete m_dcfModel;
+	if (m_dcfFile)
+		delete m_dcfFile;
+		
+	m_dcfFile = new MiniAssistantInt::dcfFile;
+	m_dcfModel = new MiniAssistantInt::dcfModel( m_dcfFile, ui.indexListView );
+	
+	m_classesLRU->reset();
+	m_dcfFile->loadFile( dcfFileName );
+	m_filterModel->setSourceModel(m_dcfModel);
+	m_locationCompleter->setModel( m_dcfModel );
+	ui.indexListView->setModel( m_filterModel );
+	ui.locationBar->setCompleter( m_locationCompleter );
+
+	connect( m_dcfFile, SIGNAL(newContentAvaialable()), this, SLOT(on_dcfFile_loaded()) );
 }
 
 /**
@@ -324,17 +404,17 @@ If the page was contained in the dcfFile documentation
 the function will return true, on any other occasion
 it will return false
 */
-bool HelpViewerImpl::displayKeyword( QString keyword )
+bool MiniAssistant::displayKeyword( QString keyword )
 {
 	keyword = keyword.toLower() + ".html";
 	if (m_dcfFile->containsPage(keyword))
 	{
-		helpBrowser->setSource( QUrl(keyword) );
+		ui.helpBrowser->setSource( QUrl(keyword) );
 
 		if (!m_dock->isVisible())
 			toggleDock();
-		mainTab->setCurrentIndex( 1 );
-		helpBrowser->setFocus();
+		ui.mainTab->setCurrentIndex( 1 );
+		ui.helpBrowser->setFocus();
 		m_dock->activateWindow();
 		return true;
 	}
@@ -352,16 +432,16 @@ The title is "Help Browser", and when the help browser is displayed
 the document title of the current page is appended to the window
 title.
 */
-void HelpViewerImpl::updateWindowTitle()
+void MiniAssistant::updateWindowTitle()
 {
-	QString s = tr("Help Browser");
-	switch (mainTab->currentIndex())
+	QString s = tr("Assistant");
+	switch (ui.mainTab->currentIndex())
 	{
 		case 0:
 			m_dock->setWindowTitle( s );
 			break;
 		case 1:
-			m_dock->setWindowTitle( s + " - " + helpBrowser->documentTitle() );
+			m_dock->setWindowTitle( s + " - " + ui.helpBrowser->documentTitle() );
 			break;
 	}
 }
@@ -379,11 +459,11 @@ which defaults to 5
 
 \see m_showMaxTop
 */
-void HelpViewerImpl::updatePopularLinks()
+void MiniAssistant::updatePopularLinks()
 {
 	QString s = tr("Popular pages (based on previous searches):") + "<ul>";
-	HelpViewer::LRU_List l = m_classesLRU->getTop(m_showMaxTop);
-	HelpViewer::LRU_List::iterator i;
+	MiniAssistantInt::LRU_List l = m_classesLRU->getTop(m_showMaxTop);
+	MiniAssistantInt::LRU_List::iterator i;
 
 	for (i = l.begin(); i != l.end(); ++i)
 	{
@@ -391,11 +471,75 @@ void HelpViewerImpl::updatePopularLinks()
 #if 0		
 		s += QString("<li><a href='%1'>%2</a></li>").arg((*i).name).arg((*i).name);
 #else
-		s +=QString( "<li><a href='%1'>%2 (%3 hits)</a></li>").arg((*i).name).arg((*i).name).arg((*i).value );
+		s += QString( "<li><a href='%1'>%2 (%3 hits)</a></li>").arg((*i).name).arg((*i).name).arg((*i).value );
 #endif
 	}
 	s+= "</ul><br>";
-	popularPages->setText( s );
+	ui.popularPages->setText( s );
+}
+
+/**
+\brief Update the suggested links for a text editor
+
+Make an educated guess about the help pages that the user 
+wants to see, based on the text on his text editor.
+
+*/
+void MiniAssistant::updateSuggestedLinks( QTextEdit *edit )
+{
+	QStringList l;
+	QTextBlock b_up, b_down; 
+	QString s;
+	int n = 5;
+	int lines_depth = 7;
+
+	b_down = b_up = edit->textCursor().block();
+	find_keywords( b_down.text(), l );
+	for( n=0; n<lines_depth; n++ )
+	{
+		if (b_down.isValid())
+		{
+			b_down = b_down.previous();
+			find_keywords( b_down.text(), l );
+		}
+		
+		if (b_up.isValid())
+		{
+			b_up = b_up.next();
+			find_keywords( b_up.text(), l  );
+		}
+	}
+
+	// now we have a list of keyworkds
+	n = 0;
+	while( n< m_showMaxTop)
+	{
+		if (n >= l.size())
+			break;
+		s += QString( "<li><a href='%1'>%2</a></li>").arg(l[n].toLower() + ".html").arg( l[n] );
+		n++;
+	}
+	
+	if (s.isEmpty())
+		s = tr("Suggested pages:") + "<ul> <li>" + tr("No suggestions") + "</li></ul><br>";
+	else
+		s = tr("Suggested pages:") + "<ul>" + s + "</ul><br>";
+	ui.helpSuggestions->setText( s );
+}
+
+void MiniAssistant::find_keywords(QString text, QStringList &list )
+{
+	QStringList l;
+	
+	//qDebug("looking for keywords - %s", qPrintable(text) );
+	l = text.split( QRegExp("[\\s()\"\\._']+") );
+	//l = text.split( " " );
+	foreach( QString s, l )
+	{
+		if (m_dcfFile->containsPage( s.toLower() +".html" ))
+			if (!list.contains(s,Qt::CaseInsensitive))
+				list << s;
+	}
 }
 
 /**
@@ -404,13 +548,13 @@ void HelpViewerImpl::updatePopularLinks()
 The button is location on top of the help browser, and will display or hide
 a line text edit which will give the user a way to input URLs to browse.
 */
-void HelpViewerImpl::on_btnShowPage_clicked(bool b)
+void MiniAssistant::on_btnShowPage_clicked(bool b)
 {
-	locationBar->setVisible( b );
+	ui.locationBar->setVisible( b );
 	if (b)
 	{
-		locationBar->setFocus();
-		locationBar->selectAll();
+		ui.locationBar->setFocus();
+		ui.locationBar->selectAll();
 	}
 }
 
@@ -420,10 +564,10 @@ void HelpViewerImpl::on_btnShowPage_clicked(bool b)
 This function will try and load the page written in the location bar
 and set the focus to the help browser.
 */
-void HelpViewerImpl::on_locationBar_returnPressed()
+void MiniAssistant::on_locationBar_returnPressed()
 {
-	helpBrowser->setSource( locationBar->text() );
-	helpBrowser->setFocus();
+	ui.helpBrowser->setSource( ui.locationBar->text() );
+	ui.helpBrowser->setFocus();
 }
 
 /**
@@ -433,16 +577,16 @@ This function will open the page listed on the list box of the
 Index tab in the help browser, and then set the current page
 the browser tab and enforce the focus on the help browser.
 */
-void HelpViewerImpl::on_indexEdit_returnPressed()
+void MiniAssistant::on_indexEdit_returnPressed()
 {
-	QModelIndex index = indexListView->currentIndex();
+	QModelIndex index = ui.indexListView->currentIndex();
 	
 	if (!index.isValid())
 		return;
 	
-	mainTab->setCurrentIndex( 1 );
-	helpBrowser->setSource( QUrl( index.data(Qt::StatusTipRole).toString() ) );
-	helpBrowser->setFocus();
+	ui.mainTab->setCurrentIndex( 1 );
+	ui.helpBrowser->setSource( QUrl( index.data(Qt::StatusTipRole).toString() ) );
+	ui.helpBrowser->setFocus();
 }
 
 /**
@@ -454,24 +598,22 @@ as fast as you want and the filtering will be done 2-3 times per second. Most pr
 can type 10 chars in less then a second, and this technique will update the filter only one
 while typing and once when the class name has been written.
 
-\todo the value of 450ms is hardcoded. Maybe a member variable?
 \todo should the timer be stopped if runnning? this way the filter is done only when the user finishes typing
-\todo is it necesaty to use a special timer function? QObject has enough support for setting timers
-\todo code cleanup, no need to test for m_indexEditTimer, it's always available
 
-\see on_indexEditTimer_timeout
+\see timerEvent()
 */
-void HelpViewerImpl::on_indexEdit_textEdited(QString s)
+void MiniAssistant::on_indexEdit_textEdited(QString)
 {
-	if (m_indexEditTimer)
+	if (m_indexEditTimer != -1)
 	{
-		if (m_indexEditTimer->isActive())
-			//m_indexEditTimer->stop();
-			return;
-		m_indexEditTimer->start( 450 );
+		killTimer( m_indexEditTimer );
+		m_indexEditTimer = -1;
+		
+		// TODO: maybe we should just return...?
+		//return;
 	}
-	else
-		m_filterModel->setFilterRegExp( s );
+
+	m_indexEditTimer = startTimer( m_indexEdit_Timeout );
 }
 
 /**
@@ -483,11 +625,10 @@ proxy model, and will update the list of calsses seen on screen.
 
 \see on_indexEdit_textEdited
 */
-void HelpViewerImpl::on_indexEditTimer_timeout()
+void MiniAssistant::on_indexEditTimer_timeout()
 {
-	m_filterModel->setFilterRegExp( indexEdit->text() );
+	m_filterModel->setFilterRegExp( ui.indexEdit->text() );
 }
-
 
 /**
 \brief Called when the user double clicks an item in the list view
@@ -499,10 +640,10 @@ page which is described on that item.
 \see dcfModel
 \see dcfFile
 */
-void HelpViewerImpl::on_indexListView_activated(QModelIndex index )
+void MiniAssistant::on_indexListView_activated(QModelIndex index )
 {
-	mainTab->setCurrentIndex( 1 );
-	helpBrowser->setSource( QUrl(index.data(Qt::StatusTipRole).toString() ) );
+	ui.mainTab->setCurrentIndex( 1 );
+	ui.helpBrowser->setSource( QUrl(index.data(Qt::StatusTipRole).toString() ) );
 }
 
 /**
@@ -513,11 +654,11 @@ When the user clicks one of those, this function is triggered and the correspond
 page will be opened. The browser tab will be displayed and the focus will be set
 to the help browser.
 */
-void HelpViewerImpl::on_helpSuggestions_linkActivated(QString link)
+void MiniAssistant::on_helpSuggestions_linkActivated(QString link)
 {
-	mainTab->setCurrentIndex( 1 );
-	helpBrowser->setSource( QUrl(link) );
-	helpBrowser->setFocus();
+	ui.mainTab->setCurrentIndex( 1 );
+	ui.helpBrowser->setSource( QUrl(link) );
+	ui.helpBrowser->setFocus();
 }
 
 /**
@@ -528,11 +669,11 @@ When the user clicks one of those, this function is triggered and the correspond
 page will be opened. The browser tab will be displayed and the focus will be set
 to the help browser.
 */
-void HelpViewerImpl::on_popularPages_linkActivated(QString link)
+void MiniAssistant::on_popularPages_linkActivated(QString link)
 {
-	mainTab->setCurrentIndex( 1 );
-	helpBrowser->setSource( QUrl(link) );
-	helpBrowser->setFocus();
+	ui.mainTab->setCurrentIndex( 1 );
+	ui.helpBrowser->setSource( QUrl(link) );
+	ui.helpBrowser->setFocus();
 }
 
 /**
@@ -549,22 +690,24 @@ updated and also set the focus to the index edit.
 \see updatePopularLinks()
 \see updateWindowTitle()
 */
-void HelpViewerImpl::on_mainTab_currentChanged(int index)
+void MiniAssistant::on_mainTab_currentChanged(int index)
 {
 	updateWindowTitle();
 	
 	// handle only when the index tab is showed
 	if (index == 1)
 	{
-		if (locationBar->isVisible() )
-			locationBar->setFocus();
+		if (ui.locationBar->isVisible() )
+		{
+			ui.locationBar->setFocus();
+			ui.locationBar->selectAll();
+		}
 		else
-			helpBrowser->setFocus();
+			ui.helpBrowser->setFocus();
 		return;
 	}
 		
-	indexEdit->setFocus();
-// 	indexEdit->activateWindow();
+	ui.indexEdit->setFocus();
 	updatePopularLinks();
 }
 
@@ -576,49 +719,14 @@ the new status, and set the new URL into the location bar.
 
 \see updateWindowTitle()
 */
-void HelpViewerImpl::on_helpBrowser_sourceChanged(QUrl u)
+void MiniAssistant::on_helpBrowser_sourceChanged(QUrl u)
 {
 	updateWindowTitle();
 	
 	if (m_classesLRU)
 		m_classesLRU->touchItem( u.path() );
 	
-	locationBar->setText( u.path() );
-}
-
-/**
-\brief Load the default DCF file
-
-Load the default file (qt.dcf) into the m_dcfFile and setup the
-model for displaing it as needed.
-
-\todo hardcoded file? bad bad bad...
-*/
-void HelpViewerImpl::loadFile()
-{
-	m_dcfFile = new HelpViewer::dcfFile;
-	m_dcfFile->loadFile( QLibraryInfo::location(QLibraryInfo::DocumentationPath) + "/html/qt.dcf" );
-	//m_dcfFile->loadFile( QLibraryInfo::location(QLibraryInfo::DocumentationPath) + "/html/assistant.dcf" );
-	//m_dcfFile->loadFile( QLibraryInfo::location(QLibraryInfo::DocumentationPath) + "/html/designer.dcf" );
-	//m_dcfFile->loadFile( QLibraryInfo::location(QLibraryInfo::DocumentationPath) + "/html/linguist.dcf" );
-	//m_dcfFile->loadFile( QLibraryInfo::location(QLibraryInfo::DocumentationPath) + "/html/qmake.dcf" );
-	
-	//m_dcfModel = new HelpViewer::dcfModel( m_dcfFile, indexListView );
-	m_dcfModel = new HelpViewer::dcfModel( m_dcfFile, indexListView );
-
-	// filter for searching classes
-	m_filterModel = new QSortFilterProxyModel(this);
-	m_filterModel->setFilterCaseSensitivity( Qt::CaseInsensitive );
-	m_filterModel->setDynamicSortFilter( true );
-	m_filterModel->setSourceModel(m_dcfModel);
-	indexListView->setModel( m_filterModel );
-
-	// completer for location bar
-	m_locationCompleter = new QCompleter( this );
-	m_locationCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-	m_locationCompleter->setCompletionMode( QCompleter::PopupCompletion );
-	m_locationCompleter->setModel( m_dcfModel );
-	locationBar->setCompleter( m_locationCompleter );
+	ui.locationBar->setText( u.path() );
 }
 
 /**
@@ -631,9 +739,9 @@ is on the filter input line
 Also, pressing escape while focusing the indexEdit will clear it.
 
 */
-bool HelpViewerImpl::eventFilter(QObject *obj, QEvent *event)
+bool MiniAssistant::eventFilter(QObject *obj, QEvent *event)
 {
-	if ( (obj == indexEdit) && (event->type() == QEvent::KeyPress) )
+	if ( (obj == ui.indexEdit) && (event->type() == QEvent::KeyPress) )
 	{
 		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 		switch(keyEvent->key()){
@@ -641,15 +749,57 @@ bool HelpViewerImpl::eventFilter(QObject *obj, QEvent *event)
 			case Qt::Key_Down:
 			case Qt::Key_PageDown:
 			case Qt::Key_PageUp:
-				QApplication::sendEvent(indexListView, event);
+				QApplication::sendEvent(ui.indexListView, event);
 				return true;
 			
 			case Qt::Key_Escape:
-				indexEdit->clear();
+				ui.indexEdit->clear();
 				return true;
 		}
 	}
 	
 	// standard event processing
 	return QObject::eventFilter(obj, event);
+}
+
+/**
+\brief Overloaded event timer
+
+This fimer is fired up when the user filters for class names.
+
+\see on_indexEdit_textEdited
+*/
+void MiniAssistant::timerEvent(QTimerEvent *)
+{
+	killTimer( m_indexEditTimer );
+	m_filterModel->setFilterRegExp( ui.indexEdit->text() );
+	m_indexEditTimer = -1;
+}
+
+/**
+\brief Called when the DCF file has been loaded
+
+This function updates the search paths of the help browser. It's connected
+by loadFile().
+
+\see loadFile()
+*/
+void MiniAssistant::on_dcfFile_loaded()
+{
+	ui.helpBrowser->setSearchPaths( QStringList( m_dcfFile->getDirectory() ) );
+	ui.helpBrowser->setSource( QUrl("file://" + m_dcfFile->getReference()) );
+	
+// TODO
+#if 0
+	// default "recently used" items
+	for( int i=0; i<2; i++ )
+	{
+		m_classesLRU->touchItem( "qabstractbutton.html" );
+		m_classesLRU->touchItem( "qmenubar.html" );
+		m_classesLRU->touchItem( "qtextedit.html" );
+		m_classesLRU->touchItem( "qstring.html" );
+		m_classesLRU->touchItem( "qwidget.html" );
+	}
+	updatePopularLinks();
+#endif
 }

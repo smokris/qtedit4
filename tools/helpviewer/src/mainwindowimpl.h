@@ -18,12 +18,20 @@ public:
 	MainWindowImpl( QWidget * parent = 0, Qt::WFlags f = 0 );
 
 private slots:
+	void on_textEdit_cursorPositionChanged();
+	void on_action_Quit_triggered();
+	
 	void on_action_Help_triggered();
 	void on_action_Seach_Help_triggered();
-	void on_action_Quit_triggered();
+	void on_actionShow_contents_triggered();
+
+protected:
+	void timerEvent(QTimerEvent *event);
 
 private:
-	HelpViewerImpl *helpViewer;
+	int guessTimer;
+	MiniAssistant *miniAssistant;
 };
 
 #endif
+

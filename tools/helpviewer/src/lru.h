@@ -14,7 +14,7 @@
 class QString;
 class QStringList;
 
-namespace HelpViewer
+namespace MiniAssistantInt
 {
 
 struct LRU_item
@@ -30,6 +30,7 @@ class LRU
 {
 public:
 	LRU();
+	void reset();
 	void touchItem( QString name );
 	LRU_List getTop( int n = 5 );
 	void print_list();

@@ -28,8 +28,17 @@
     </property>
     <item>
      <widget class="QTextEdit" name="textEdit" >
+      <property name="font" >
+       <font>
+        <family>Courier New</family>
+        <stylestrategy>NoAntialias</stylestrategy>
+       </font>
+      </property>
       <property name="lineWrapMode" >
        <enum>QTextEdit::NoWrap</enum>
+      </property>
+      <property name="acceptRichText" >
+       <bool>false</bool>
       </property>
      </widget>
     </item>

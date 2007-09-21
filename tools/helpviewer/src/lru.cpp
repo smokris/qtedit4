@@ -1,11 +1,11 @@
 #include "lru.h"
 #include <QStringList>
 
-namespace HelpViewer{
+namespace MiniAssistantInt {
 
 /**
 \struct LRU_item
-\brief An antry in the LRU table
+\brief An entry in the LRU table
 
 Each item in the LRU table represents a visit to a page. The visit has a location, a date, 
 and the amount of "time" that passed since it was first created.
@@ -48,6 +48,16 @@ Constructs an LRU class.
 LRU::LRU()
 {
 	// TODO how to compile an empty constuctor
+}
+
+/**
+\brief Reset the LRU
+
+This method will remove all itmes from the list, and zero the statistics.
+*/
+void LRU::reset()
+{
+	items.clear();
 }
 
 /**
@@ -132,7 +142,7 @@ This function prints the internal status of the LRU. To be removed soon.
 */
 void LRU::print_list()
 {
-	HelpViewer::LRU_List::iterator i;
+	LRU_List::iterator i;
 
 	qDebug("list begin");
 	for (i = items.begin(); i != items.end(); ++i)

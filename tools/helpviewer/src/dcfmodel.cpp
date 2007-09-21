@@ -5,12 +5,12 @@
  * License LGPL
  */
 
+#include <QModelIndex>
+
 #include "dcfmodel.h"
 #include "dcffile.h"
 
-#include <QModelIndex>
-
-namespace HelpViewer {
+namespace MiniAssistantInt {
 
 /**
 \class dcfModel
@@ -76,7 +76,6 @@ int dcfModel::rowCount( const QModelIndex &parent ) const
 	else
 		i = m_dcf->references.count();
 	
-	qDebug("using %d items", i );
 	return i;
 
 	// shut up gcc warnings

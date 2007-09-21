@@ -14,56 +14,66 @@
 class QCompleter;
 class QDockWidget;
 class QSortFilterProxyModel;
+class QTextEdit;
+class QTextDocument;
 	
 // forward declarations
-namespace HelpViewer{
+namespace MiniAssistantInt 
+{
 	class LRU;
 	class dcfModel;
 	class dcfFile;
 }
 
-class HelpViewerImpl : public QObject, public Ui::helpViewerForm
+class MiniAssistant : public QObject
 {
 Q_OBJECT
 public:
-	HelpViewerImpl( QWidget * parent = 0 );
+	MiniAssistant( QWidget * parent = 0 );
 
 public slots:
 	void toggleDock();
 	void showContents();
+	void showMiniBrowser();
+	void loadFile( QString dcfFileName );
 	void showPage( QString page );
 	bool displayKeyword( QString keyword );
 	void updateWindowTitle();
 	void updatePopularLinks();
+	void updateSuggestedLinks( QTextEdit* );
+	
+	void find_keywords(QString text, QStringList &l );
 
 private slots:
 	void on_btnShowPage_clicked(bool b);
 	void on_locationBar_returnPressed();
 	void on_indexEdit_returnPressed();
-	void on_indexEdit_textEdited(QString );
+	void on_indexEdit_textEdited(QString);
 	void on_indexEditTimer_timeout();
 	void on_indexListView_activated(QModelIndex);
 	void on_helpSuggestions_linkActivated(QString link);
 	void on_popularPages_linkActivated(QString link);
 	void on_mainTab_currentChanged(int index);
 	void on_helpBrowser_sourceChanged(QUrl );
-	void loadFile();
+	void on_dcfFile_loaded();
 
 protected:
 	bool eventFilter(QObject *obj, QEvent *event);
-
-private:
+	void timerEvent(QTimerEvent *event);
 	
+private:
 	int		m_showMaxTop;
+	int		m_indexEditTimer;
+	int		m_indexEdit_Timeout;
 	QWidget		*m_dock_widget;
 	QDockWidget	*m_dock;
 	QCompleter	*m_locationCompleter;
-	QTimer		*m_indexEditTimer;
 	QSortFilterProxyModel *m_filterModel;
 
-	HelpViewer::dcfFile	*m_dcfFile;	
-	HelpViewer::dcfModel	*m_dcfModel;
-	HelpViewer::LRU		*m_classesLRU;
+	Ui::helpViewerForm		ui;
+	MiniAssistantInt::dcfFile	*m_dcfFile;	
+	MiniAssistantInt::dcfModel	*m_dcfModel;
+	MiniAssistantInt::LRU		*m_classesLRU;
 };
 
 #endif

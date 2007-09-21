@@ -17,7 +17,7 @@ class QDomDocument;
 class QDomNode;
 class QFile;
 
-namespace HelpViewer {
+namespace MiniAssistantInt {
 
 class dcfFile;
 class dcfModel;
@@ -49,7 +49,11 @@ public:
 	void loadFile( QString fileName );
 	void loadDocument( QDomDocument doc );
 	void loadSection( QDomNode node );
+	
 	bool containsPage( QString pageName );
+	QString getLoadedFile();
+	QString getDirectory();
+	QString getReference();
 
 public slots:
 	void fileLoaded();
@@ -58,6 +62,7 @@ signals:
 	void newContentAvaialable();
 	
 private:
+	QString m_fileName;
 	QString reference;
 	QString icon;
 	QString imageDir;

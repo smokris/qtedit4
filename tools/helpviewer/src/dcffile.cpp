@@ -1,18 +1,20 @@
 /**
  * \file dcffile.cpp
- * \brief Implementation of the dcf file loader
+ * \brief Implementation of the DCF file loader
  * \author Diego Iastrubni (elcuco@kde.org)
  * License LGPL
  */
 
-#include "dcffile.h"
-#include <QDebug>
-
 #include <QDomDocument>
 #include <QFile>
+#include <QFileInfo>
 #include <QString>
 
-namespace HelpViewer {
+#include <QDebug>
+
+#include "dcffile.h"
+
+namespace MiniAssistantInt {
 
 #define NEW_DCF_LOAD
 #define ASYNC_FILE_LOADING
@@ -173,7 +175,7 @@ Constructs a dcfFile class.
 */
 dcfFile::dcfFile(  )
 {
-	
+	// NULL constructor
 }
 
 /**
@@ -194,13 +196,15 @@ To modify the loading mode, there is a define at the top of dcffile.cpp which co
 this behaviour. The default is asynchronous loading, and you are \n not encouraged to modify
 this default.
 
-\todo Should this signal be emited aswell when the synchronous loading is defined...?
+\todo Should this signal be emited as well, even when the synchronous loading is defined...?
 
 \see loadDocument()
 \see dcfFileLoadThread
 */
 void dcfFile::loadFile( QString fileName )
 {
+	m_fileName.clear();
+	
 #ifdef ASYNC_FILE_LOADING
 	loadingThread = new dcfFileLoadThread( this, fileName );
 	connect( loadingThread, SIGNAL(finished()), this, SLOT(fileLoaded()));
@@ -227,6 +231,7 @@ void dcfFile::loadFile( QString fileName )
 // 	TODO: emit as well...?
 // 	emit newContentAvaialable();
 #endif
+	m_fileName = fileName;
 }
 
 /**
@@ -249,7 +254,7 @@ void dcfFile::loadDocument( QDomDocument doc )
 	icon		= dcf_head.attributes().namedItem("icon").nodeValue();
 	imageDir	= dcf_head.attributes().namedItem("imagedir").nodeValue();
 	title		= dcf_head.attributes().namedItem("title").nodeValue();
-
+	
 #ifdef NEW_DCF_LOAD
 	loadSection( dcf_head );
 #else
@@ -291,7 +296,6 @@ void dcfFile::loadSection( QDomNode node )
 			
 			n2 = n2.nextSiblingElement("keyword");
 		}
-
 		loadSection( n );
 		n = n.nextSiblingElement("section");
 	}
@@ -359,5 +363,22 @@ void dcfFile::fileLoaded()
 When loading the file in asynchronous mode, this signal is emited when there is new content
 avaialable. 
 */
+
+QString dcfFile::getLoadedFile()
+{
+	return m_fileName;
+}
+
+QString dcfFile::getDirectory()
+{
+	QFileInfo i(m_fileName);
+	return i.absolutePath();
+}
+
+QString dcfFile::getReference()
+{
+	QString s = getDirectory() + "/" + reference;
+	return s;
+}
 
 } // end of namespace
