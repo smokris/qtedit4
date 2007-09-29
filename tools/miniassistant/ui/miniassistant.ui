@@ -37,7 +37,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex" >
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="indexTab" >
       <attribute name="title" >
@@ -45,23 +45,23 @@
       </attribute>
       <layout class="QVBoxLayout" >
        <item>
-        <widget class="QLabel" name="label" >
+        <widget class="QLabel" name="referencesListFilterLabel" >
          <property name="text" >
           <string>&amp;Look for:</string>
          </property>
          <property name="buddy" >
-          <cstring>indexEdit</cstring>
+          <cstring>referencesListFilter</cstring>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="indexEdit" />
+        <widget class="QLineEdit" name="referencesListFilter" />
        </item>
        <item>
-        <widget class="QListView" name="indexListView" />
+        <widget class="QListView" name="referencesListView" />
        </item>
        <item>
-        <widget class="QLabel" name="helpSuggestions" >
+        <widget class="QLabel" name="suggestedPanel" >
          <property name="frameShape" >
           <enum>QFrame::StyledPanel</enum>
          </property>
@@ -69,17 +69,17 @@
           <enum>QFrame::Plain</enum>
          </property>
          <property name="text" >
-          <string>Help suggestions (based on the editor):
-&lt;ul>
-&lt;li>&lt;a href="qstring.html" title="The QString class provides a Unicode character string">QString&lt;/a>&lt;/li>
-
-&lt;li>&lt;a href="qwidget.html">QWidget&lt;/a>&lt;/li>
-
-&lt;li>&lt;a href="qapplication.html">QApplication&lt;/a>&lt;/li>
-
-&lt;li>&lt;a href="qobject.html">QObject&lt;/a>&lt;/li>
-
-&lt;ul>
+          <string>Help suggestions (based on the editor):&#xd;
+&lt;ul>&#xd;
+&lt;li>&lt;a href="qstring.html" title="The QString class provides a Unicode character string">QString&lt;/a>&lt;/li>&#xd;
+&#xd;
+&lt;li>&lt;a href="qwidget.html">QWidget&lt;/a>&lt;/li>&#xd;
+&#xd;
+&lt;li>&lt;a href="qapplication.html">QApplication&lt;/a>&lt;/li>&#xd;
+&#xd;
+&lt;li>&lt;a href="qobject.html">QObject&lt;/a>&lt;/li>&#xd;
+&#xd;
+&lt;ul>&#xd;
 &lt;br></string>
          </property>
          <property name="textFormat" >
@@ -91,7 +91,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="popularPages" >
+        <widget class="QLabel" name="popularPanel" >
          <property name="frameShape" >
           <enum>QFrame::StyledPanel</enum>
          </property>
@@ -145,7 +145,7 @@
             <string>&lt;&lt;</string>
            </property>
            <property name="icon" >
-            <iconset resource="../helpviewer.qrc" >:/images/previous.png</iconset>
+            <iconset resource="../miniassistant.qrc" >:/images/previous.png</iconset>
            </property>
           </widget>
          </item>
@@ -161,7 +161,7 @@
             <string>[]</string>
            </property>
            <property name="icon" >
-            <iconset resource="../helpviewer.qrc" >:/images/buildrun.png</iconset>
+            <iconset resource="../miniassistant.qrc" >:/images/buildrun.png</iconset>
            </property>
           </widget>
          </item>
@@ -174,7 +174,7 @@
             <string>>></string>
            </property>
            <property name="icon" >
-            <iconset resource="../helpviewer.qrc" >:/images/next.png</iconset>
+            <iconset resource="../miniassistant.qrc" >:/images/next.png</iconset>
            </property>
           </widget>
          </item>
@@ -210,7 +210,7 @@
             <string>+</string>
            </property>
            <property name="icon" >
-            <iconset resource="../helpviewer.qrc" >:/images/ajouter.png</iconset>
+            <iconset resource="../miniassistant.qrc" >:/images/ajouter.png</iconset>
            </property>
           </widget>
          </item>
@@ -220,7 +220,7 @@
             <string>-</string>
            </property>
            <property name="icon" >
-            <iconset resource="../helpviewer.qrc" >:/images/supprimer.png</iconset>
+            <iconset resource="../miniassistant.qrc" >:/images/supprimer.png</iconset>
            </property>
           </widget>
          </item>
@@ -233,7 +233,7 @@
             <string>^</string>
            </property>
            <property name="icon" >
-            <iconset resource="../helpviewer.qrc" >:/images/helpassistant.png</iconset>
+            <iconset resource="../miniassistant.qrc" >:/images/helpassistant.png</iconset>
            </property>
           </widget>
          </item>
@@ -263,7 +263,8 @@
   </layout>
  </widget>
  <resources>
-  <include location="../helpviewer.qrc" />
+  <include location="../miniassistant.qrc" />
+  <include location="../miniassistant.qrc" />
  </resources>
  <connections>
   <connection>

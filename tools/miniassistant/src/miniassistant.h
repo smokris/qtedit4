@@ -47,12 +47,12 @@ public slots:
 private slots:
 	void on_btnShowPage_clicked(bool b);
 	void on_locationBar_returnPressed();
-	void on_indexEdit_returnPressed();
-	void on_indexEdit_textEdited(QString);
+	void on_referencesListFilter_returnPressed();
+	void on_referencesListFilter_textEdited(QString);
 	void on_indexEditTimer_timeout();
-	void on_indexListView_activated(QModelIndex);
-	void on_helpSuggestions_linkActivated(QString link);
-	void on_popularPages_linkActivated(QString link);
+	void on_referencesListView_activated(QModelIndex);
+	void on_suggestedPanel_linkActivated(QString link);
+	void on_popularPanel_linkActivated(QString link);
 	void on_mainTab_currentChanged(int index);
 	void on_helpBrowser_sourceChanged(QUrl );
 	void on_dcfFile_loaded();

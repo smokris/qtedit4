@@ -127,20 +127,20 @@ It uses the model for completition.
 \var MiniAssistant::m_indexEditTimer
 \brief Use to help filtering text
 
-When the user presses the keyboard on the indexEdit
+When the user presses the keyboard on the reference list filter
 this timer will be triggered. The full documentation 
-can be found in on_indexEdit_textEdited.
+can be found in on_referencesListFilter_textEdited.
 
 \see timerEvent()
-\see on_indexEdit_textEdited()
+\see on_referencesListFilter_textEdited()
 */
 
 /**
 \var MiniAssistant::m_filterModel
-\brief Filter the results on the indexListView
+\brief Filter the results on the referencesListView
 
 When the user wants to filter the list of classes, this class
-will be used to filter the display in the indexListView.
+will be used to filter the display in the referencesListView.
 
 \see m_dcfModel
 */
@@ -207,13 +207,13 @@ MiniAssistant::MiniAssistant( QWidget * parent )
 	m_dock_widget = new QWidget(m_dock);
 	
 	ui.setupUi(m_dock_widget);
-	connect( ui.indexEdit, SIGNAL(textEdited(QString)), this, SLOT(on_indexEdit_textEdited(QString)));
+	connect( ui.referencesListFilter, SIGNAL(textEdited(QString)), this, SLOT(on_referencesListFilter_textEdited(QString)));
 	connect( ui.helpBrowser, SIGNAL(sourceChanged(QUrl)), this, SLOT(on_helpBrowser_sourceChanged(QUrl)));
 	connect( ui.mainTab, SIGNAL(currentChanged(int)), this, SLOT(on_mainTab_currentChanged(int)));
-	connect( ui.helpSuggestions, SIGNAL(linkActivated(QString)), this, SLOT(on_helpSuggestions_linkActivated(QString)));
-	connect( ui.popularPages, SIGNAL(linkActivated(QString)), this, SLOT(on_popularPages_linkActivated(QString)));
-	connect( ui.indexListView, SIGNAL(activated(QModelIndex )), this, SLOT(on_indexListView_activated(QModelIndex)));
-	connect( ui.indexEdit, SIGNAL(returnPressed()), this, SLOT(on_indexEdit_returnPressed()));
+	connect( ui.suggestedPanel, SIGNAL(linkActivated(QString)), this, SLOT(on_suggestedPanel_linkActivated(QString)));
+	connect( ui.popularPanel, SIGNAL(linkActivated(QString)), this, SLOT(on_popularPanel_linkActivated(QString)));
+	connect( ui.referencesListView, SIGNAL(activated(QModelIndex )), this, SLOT(on_referencesListView_activated(QModelIndex)));
+	connect( ui.referencesListFilter, SIGNAL(returnPressed()), this, SLOT(on_referencesListFilter_returnPressed()));
 	connect( ui.locationBar, SIGNAL(returnPressed()), this, SLOT(on_locationBar_returnPressed()));
 	connect( ui.btnShowPage, SIGNAL(clicked(bool)), this, SLOT(on_btnShowPage_clicked(bool)));
 	
@@ -224,8 +224,8 @@ MiniAssistant::MiniAssistant( QWidget * parent )
 	
 	ui.helpBrowser->zoomOut( 1 );
 	
-	ui.indexEdit->installEventFilter( this );
-	ui.indexListView->setAlternatingRowColors( true );
+	ui.referencesListFilter->installEventFilter( this );
+	ui.referencesListView->setAlternatingRowColors( true );
 	ui.locationBar->hide();
 
 	m_dcfModel = NULL;
@@ -285,7 +285,7 @@ This function will toggle the contents viewer, the Index tab:
 */
 void MiniAssistant::showContents()
 {
-	QString s = "file://" + m_dcfFile->getReference();
+	QString s = m_dcfFile->getReference();
 	
 	// this is called an educated guess
 	if (s[s.length()-1] == QDir::separator())
@@ -303,7 +303,7 @@ void MiniAssistant::showContents()
 	}
 	else
 	{	// show it
-		ui.helpBrowser->setSource( QUrl(s) );
+		ui.helpBrowser->setSource( QUrl::fromLocalFile(s) );
 		ui.mainTab->setCurrentIndex(0);
 		on_mainTab_currentChanged( 0 );
 		this->toggleDock();
@@ -378,13 +378,13 @@ void MiniAssistant::loadFile( QString dcfFileName )
 		delete m_dcfFile;
 		
 	m_dcfFile = new MiniAssistantInt::dcfFile;
-	m_dcfModel = new MiniAssistantInt::dcfModel( m_dcfFile, ui.indexListView );
+	m_dcfModel = new MiniAssistantInt::dcfModel( m_dcfFile, ui.referencesListView );
 	
 	m_classesLRU->reset();
 	m_dcfFile->loadFile( dcfFileName );
 	m_filterModel->setSourceModel(m_dcfModel);
 	m_locationCompleter->setModel( m_dcfModel );
-	ui.indexListView->setModel( m_filterModel );
+	ui.referencesListView->setModel( m_filterModel );
 	ui.locationBar->setCompleter( m_locationCompleter );
 
 	connect( m_dcfFile, SIGNAL(newContentAvaialable()), this, SLOT(on_dcfFile_loaded()) );
@@ -475,7 +475,7 @@ void MiniAssistant::updatePopularLinks()
 #endif
 	}
 	s+= "</ul><br>";
-	ui.popularPages->setText( s );
+	ui.popularPanel->setText( s );
 }
 
 /**
@@ -524,7 +524,7 @@ void MiniAssistant::updateSuggestedLinks( QTextEdit *edit )
 		s = tr("Suggested pages:") + "<ul> <li>" + tr("No suggestions") + "</li></ul><br>";
 	else
 		s = tr("Suggested pages:") + "<ul>" + s + "</ul><br>";
-	ui.helpSuggestions->setText( s );
+	ui.suggestedPanel->setText( s );
 }
 
 void MiniAssistant::find_keywords(QString text, QStringList &list )
@@ -577,9 +577,9 @@ This function will open the page listed on the list box of the
 Index tab in the help browser, and then set the current page
 the browser tab and enforce the focus on the help browser.
 */
-void MiniAssistant::on_indexEdit_returnPressed()
+void MiniAssistant::on_referencesListFilter_returnPressed()
 {
-	QModelIndex index = ui.indexListView->currentIndex();
+	QModelIndex index = ui.referencesListView->currentIndex();
 	
 	if (!index.isValid())
 		return;
@@ -602,7 +602,7 @@ while typing and once when the class name has been written.
 
 \see timerEvent()
 */
-void MiniAssistant::on_indexEdit_textEdited(QString)
+void MiniAssistant::on_referencesListFilter_textEdited(QString)
 {
 	if (m_indexEditTimer != -1)
 	{
@@ -619,15 +619,15 @@ void MiniAssistant::on_indexEdit_textEdited(QString)
 /**
 \brief Called when the keypress timer is dome
 
-When the user modifies the indexEdit a timer is issued, and only when the timer
+When the user modifies the references list filter a timer is issued, and only when the timer
 ends this callback is generated. This function will update the filter regex for the
 proxy model, and will update the list of calsses seen on screen.
 
-\see on_indexEdit_textEdited
+\see on_referencesListFilter_textEdited
 */
 void MiniAssistant::on_indexEditTimer_timeout()
 {
-	m_filterModel->setFilterRegExp( ui.indexEdit->text() );
+	m_filterModel->setFilterRegExp( ui.referencesListFilter->text() );
 }
 
 /**
@@ -640,21 +640,21 @@ page which is described on that item.
 \see dcfModel
 \see dcfFile
 */
-void MiniAssistant::on_indexListView_activated(QModelIndex index )
+void MiniAssistant::on_referencesListView_activated(QModelIndex index )
 {
 	ui.mainTab->setCurrentIndex( 1 );
 	ui.helpBrowser->setSource( QUrl(index.data(Qt::StatusTipRole).toString() ) );
 }
 
 /**
-\brief Called when the user pressed a link in the help suggestions label
+\brief Called when the user pressed a link in the help suggestions panel
 
-The help suggestions label contains links to different pages in the documentation.
+The help suggestions panel contains links to different pages in the documentation.
 When the user clicks one of those, this function is triggered and the corresponding
 page will be opened. The browser tab will be displayed and the focus will be set
 to the help browser.
 */
-void MiniAssistant::on_helpSuggestions_linkActivated(QString link)
+void MiniAssistant::on_suggestedPanel_linkActivated(QString link)
 {
 	ui.mainTab->setCurrentIndex( 1 );
 	ui.helpBrowser->setSource( QUrl(link) );
@@ -662,14 +662,14 @@ void MiniAssistant::on_helpSuggestions_linkActivated(QString link)
 }
 
 /**
-\brief Called when the user pressed a link in the popular pages label
+\brief Called when the user pressed a link in the popular pages pane;
 
-The help suggestions label contains links to different pages in the documentation.
+The help suggestions panel contains links to different pages in the documentation.
 When the user clicks one of those, this function is triggered and the corresponding
 page will be opened. The browser tab will be displayed and the focus will be set
 to the help browser.
 */
-void MiniAssistant::on_popularPages_linkActivated(QString link)
+void MiniAssistant::on_popularPanel_linkActivated(QString link)
 {
 	ui.mainTab->setCurrentIndex( 1 );
 	ui.helpBrowser->setSource( QUrl(link) );
@@ -707,7 +707,7 @@ void MiniAssistant::on_mainTab_currentChanged(int index)
 		return;
 	}
 		
-	ui.indexEdit->setFocus();
+	ui.referencesListView->setFocus();
 	updatePopularLinks();
 }
 
@@ -730,18 +730,18 @@ void MiniAssistant::on_helpBrowser_sourceChanged(QUrl u)
 }
 
 /**
-\brief Filter events sent to the indexEdit
+\brief Filter events sent to the references list filter
 
-Event filter to catch keyboard events on the indexEdit
-Send Key_Down, Key_Up, Key_PageDown, Key_PageUp to the indexListView
+Event filter to catch keyboard events on the referencesListFilter
+Send Key_Down, Key_Up, Key_PageDown, Key_PageUp to the referencesListView
 This way the user can navigate the list of itmes when the focus
 is on the filter input line
-Also, pressing escape while focusing the indexEdit will clear it.
+Also, pressing escape while focusing the references list filter will clear it.
 
 */
 bool MiniAssistant::eventFilter(QObject *obj, QEvent *event)
 {
-	if ( (obj == ui.indexEdit) && (event->type() == QEvent::KeyPress) )
+	if ( (obj == ui.referencesListFilter) && (event->type() == QEvent::KeyPress) )
 	{
 		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 		switch(keyEvent->key()){
@@ -749,11 +749,11 @@ bool MiniAssistant::eventFilter(QObject *obj, QEvent *event)
 			case Qt::Key_Down:
 			case Qt::Key_PageDown:
 			case Qt::Key_PageUp:
-				QApplication::sendEvent(ui.indexListView, event);
+				QApplication::sendEvent(ui.referencesListView, event);
 				return true;
 			
 			case Qt::Key_Escape:
-				ui.indexEdit->clear();
+				ui.referencesListFilter->clear();
 				return true;
 		}
 	}
@@ -767,12 +767,12 @@ bool MiniAssistant::eventFilter(QObject *obj, QEvent *event)
 
 This fimer is fired up when the user filters for class names.
 
-\see on_indexEdit_textEdited
+\see on_referencesListFilter_textEdited
 */
 void MiniAssistant::timerEvent(QTimerEvent *)
 {
 	killTimer( m_indexEditTimer );
-	m_filterModel->setFilterRegExp( ui.indexEdit->text() );
+	m_filterModel->setFilterRegExp( ui.referencesListFilter->text() );
 	m_indexEditTimer = -1;
 }
 
@@ -787,7 +787,7 @@ by loadFile().
 void MiniAssistant::on_dcfFile_loaded()
 {
 	ui.helpBrowser->setSearchPaths( QStringList( m_dcfFile->getDirectory() ) );
-	ui.helpBrowser->setSource( QUrl("file://" + m_dcfFile->getReference()) );
+	ui.helpBrowser->setSource( QUrl::fromLocalFile( m_dcfFile->getReference() ) );
 	
 // TODO
 #if 0

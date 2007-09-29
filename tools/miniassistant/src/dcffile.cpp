@@ -377,8 +377,7 @@ QString dcfFile::getDirectory()
 
 QString dcfFile::getReference()
 {
-	QString s = getDirectory() + "/" + reference;
-	return s;
+	return getDirectory() + "/" + reference;
 }
 
 } // end of namespace
