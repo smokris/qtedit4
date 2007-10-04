@@ -19,8 +19,8 @@ The Mini Assistant has the following features:
  - Uses the model view controller support provided by Qt4
  - All internal classes are contained in an MiniAssistantInt internal namespace 
 
-[http://qt-apps.org/CONTENT/content-m1/m67392-1.png http://qtedit4.googlecode.com/svn/tags/miniassistant_0_0_1/doc/miniassistant-index.png]
-[http://qt-apps.org/CONTENT/content-m2/m67392-2.png http://qtedit4.googlecode.com/svn/tags/miniassistant_0_0_1/doc/miniassistant-minibrowser-linux.png]
+[http://qtedit4.googlecode.com/svn/tags/miniassistant_0_0_1/doc/miniassistant-index.png http://qt-apps.org/CONTENT/content-m1/m67392-1.png]
+[http://qtedit4.googlecode.com/svn/tags/miniassistant_0_0_1/doc/miniassistant-minibrowser-linux.png http://qt-apps.org/CONTENT/content-m2/m67392-2.png]
 
 QtApps home page:
 http://qt-apps.org/content/show.php?content=67392
