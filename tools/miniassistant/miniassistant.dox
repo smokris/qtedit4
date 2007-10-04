@@ -3,13 +3,13 @@
 \mainpage
 
 \section Introduction
-The mini-assistant is a small widget, which can be embbeded 
+The Mini Assistant is a small widget, which can be embbeded 
 within your application to provide a similar experience
-as the full bloat Qt4-Assitant, with some constrains. 
+as the full bloat Qt4-Assitant, with some constrains.
 
 \image html miniassistant-index.png
 
-This is a stand alon dockable widget which is completely
+This is a stand alone dockable widget which is completely
 self contained, and has constructed mainly of a tab widget which
 separates the GUI to the \link IndexTab index tab \endlink and the 
 \link MiniBrowser Mini-Browser \endlink
