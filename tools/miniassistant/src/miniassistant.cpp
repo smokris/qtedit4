@@ -681,11 +681,11 @@ void MiniAssistant::on_popularPanel_linkActivated(QString link)
 
 This function will update the title of the dock window. 
 
-When the tab index is "1", the second tab page, the help browser will be focused,
-unless the location bar is visible, in which case it will be focused.
-
 When the tab index is "0", the first tab page, the popular links label will be 
 updated and also set the focus to the index edit.
+
+When the tab index is "1", the second tab page, the help browser will be focused,
+unless the location bar is visible, in which case it will be focused.
 
 \see updatePopularLinks()
 \see updateWindowTitle()
@@ -694,21 +694,23 @@ void MiniAssistant::on_mainTab_currentChanged(int index)
 {
 	updateWindowTitle();
 	
-	// handle only when the index tab is showed
-	if (index == 1)
+	switch(index)
 	{
-		if (ui.locationBar->isVisible() )
-		{
-			ui.locationBar->setFocus();
-			ui.locationBar->selectAll();
-		}
-		else
-			ui.helpBrowser->setFocus();
-		return;
+		case 0:
+			ui.referencesListFilter->setFocus();
+			updatePopularLinks();
+			break;
+
+		case 1:
+			if (ui.locationBar->isVisible() )
+			{
+				ui.locationBar->setFocus();
+				ui.locationBar->selectAll();
+			}
+			else
+				ui.helpBrowser->setFocus();
+			break;
 	}
-		
-	ui.referencesListView->setFocus();
-	updatePopularLinks();
 }
 
 /**

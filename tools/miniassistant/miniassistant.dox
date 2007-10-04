@@ -1,0 +1,107 @@
+/**
+
+\mainpage
+
+\section Introduction
+The mini-assistant is a small widget, which can be embbeded 
+within your application to provide a similar experience
+as the full bloat Qt4-Assitant, with some constrains. 
+
+\image html miniassistant-index.png
+
+This is a stand alon dockable widget which is completely
+self contained, and has constructed mainly of a tab widget which
+separates the GUI to the \link IndexTab index tab \endlink and the 
+\link MiniBrowser Mini-Browser \endlink
+
+The Mini Assistant has the following features:
+ - Can load \link MiniAssistantInt::dcfFile  DCF files \endlink, used by Qt4 documentation
+ - Can display the Qt4 documentation 
+ - Can display a list of references available in the loaded DCF file
+ - Can filter the list of pages "on the fly"
+ - The Mini Browser has a "URL" edit for quick acess to pages, which supports completion
+ - Tracks the \link MiniAssistantInt::LRU history of visited help pages \endlink, and lists them as popular pages
+ - Can scan a QTextEdit a give suggestions to help pages
+ - Uses the \link MiniAssistantInt::dcfModel model view controller \endlink support provided by Qt4
+ - All internal classes are contained in an MiniAssistantInt internal namespace 
+
+For usage documentation, you can visit the \link IndexTab index tab \endlink and the 
+\link MiniBrowser mini-browser \endlink pages.
+
+
+\page IndexTab
+
+The first tab of the Mini Assistant is the index page. It contains the Reference Filter ,
+Referece list ,suggested panel and Populr panel. You may also see the documentation of the
+\link MiniBrowser Mini-Browser \endlink.
+
+\image html miniassistant-index-linux-names.png
+
+\section ReferenceFilter Reference filter
+The reference filter is a simple input line, which lets you filter trough the references available in the loaded
+DCF file. When you press \b enter the text on the line editor will be opened in the Mini Browser page. The input 
+line uses will be used to filter out the references available in the reference list.
+
+You can press the down/up, page down/up keys on the reference filter input line, and those key presses
+will be sent to the reference list. 
+
+\section ReferenceList Reference list
+The reference list is a list view which displays a list of all the available references in the loaded DCF file. 
+The list uses the \link MiniAssistantInt::dcfModel DEF model \endlink for displaying it's data, and a proxy sort filter
+to filter out references according to the text the user inputs in the reference filter.
+
+\section SuggestionPanel Suggestion panel
+This panel is used for displaying related searches to the user. By default a standard function is provided
+which searches for known keywords (keywords which are valid references in the currently loaded DCF file). Future
+releases will contain a well struted API to modify the suggestion link from a user application.
+
+\section PopularPanel Popular panel
+Each time a documentation page is visited, it's entry is updated in the internal LRU. This list displays the top 5
+items of the LRU.
+
+For more documentation about the LRU's logic, please refer to MiniAssistantInt::LRU
+
+
+\page MiniBrowser
+
+The Mini-Browser is a scaled down version of the main document browser available on the Qt Assistant. 
+
+The difference between the help browser in the assistant and the Mini Browser are:
+ - The Qt Assitant is a stand alone application, while this is a embbededable widget
+ - You can only view one page at a time (no tabs)
+ - No search (yet, next version will support search)
+ - Contents are scaled down (by 2 factors)
+ - You have a hidden input line for setting the exact page to browse.
+ 
+\image html miniassistant-minibrowser-linux-names.png
+
+\section ButtonGroup1 Button group 1
+
+This button group is tries to mimic the behaviour seen in any WEB browser. The buttons provide back/home/forward 
+functionality to the Mini Browser.
+
+\section ButtonGroup2 Button group 2
+This groups contains 4 buttons:
+ - Hide/show the page input line. Marked by "..." text.
+ - Zoom up. This button will increase the text size by one factor. by default also the keyboard shortcut 
+   "ctrl +" will have the same effect. The button is marked by a green + sign.
+ - Zoom down. This button will decrease the text size by one factor. by default also the keyboard shortcut 
+   "ctrl -" will have the same effect. The button is marked by a red - sign.
+ - Show in Assiatant. Clicking this button will display the currently visited page in the Qt Assitant by
+   opening a new instance if needed (still not implemented). The button is marked by the Assitant Logo.
+
+\section PageInputLine Page input line
+This is input line which gives you the option to directly navigate to a specific page (think of it as a URL
+bar in a WEB browser). It will complete the text with the page names, and the tooltip will be the page name. 
+
+For example, typing "qstrin" will find all pages which start with "qstring", for example qstring.html which
+is the documentation page for the QString class.
+
+Note that by default this widget is hidden, and to display it you will have to press the leftmost button in 
+the right button group, the button marked with "...".
+
+\section MiniBrowserWidget
+The last part of this tab is the Mini Browser widget. This is a normal QTextBrowser widget.
+
+Future versions of this project will have also text search support in the current page.
+*/
