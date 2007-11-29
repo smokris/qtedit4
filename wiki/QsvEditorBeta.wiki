@@ -3,6 +3,8 @@
 The QtSourceView project currently consists of a framework for syntax highlighters.
 The project needs also a text editor control, more suitable for code editing. 
 
+http://qtedit4.googlecode.com/svn/wiki/Visual-Features.PNG
+
 == Planned features ==
  # Line numbers, with current line marked as bold
  # File modification panel
@@ -30,8 +32,6 @@ The editor should also have these characteristics:
  * Should not depend on 3rd party libraries (only Qt4)
  * Derive directly from QTextEdit and not include it (using layouts and other tricks)
  * Easy for 3rd party users to use.
-
-http://qtedit4.googlecode.com/svn/wiki/Visual-Features.PNG
 
 == Get the code ==
 
