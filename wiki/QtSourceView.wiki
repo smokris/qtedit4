@@ -9,6 +9,8 @@ for gtk. The difinitions are passed to a class which does the highligting. This 
 that the engine is not aware of what he is coloring, and adding new languages is as
 trivial as adding new XML to the langs directory.
 
+See also [QsvEditorBeta qsveditorbeta] for more information about the editor control to be released in the future.
+
 = License =
 All code is licensed under the terms of the LGPL.
 
