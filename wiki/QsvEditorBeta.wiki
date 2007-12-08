@@ -55,15 +55,16 @@ svn co http://qtedit4.googlecode.com/svn/tools/qtsourceview/ qtsourceview
 
 The editor control is available as demos/demo4/demo4-debug.pro. 
 
-== Status == 
- * Replace control has currently no configuration.
- * Whitespace support is done via images, which does not scale right. Need to find similar Unicode chars.
- * Better text navigation (8), not implemented at all.
+== Status/TODO == 
+ * Replace functionally missing: no option to replace within selected text.(started working on revision r226)
+ * ~~Whitespace support is done via images, which does not scale right. Need to find similar Unicode chars.~~ done since revision r227.
+ * ~~Better text navigation (8)~~ done since revision r227 r229
  * Auto brackets (11) is not fully implemented. Deleting does not always work.
  * Modified lines (12) does not work as expected, when pasting lines, they are not marked as modified.
  * No central way of controlling editors (13), the EditorConfig class does not emit a usable signal.
  * VIM modelines not implemented yet.
  * No special printing support is coded yet.
+
 
 == Feature walk trough ==
  # *Line numbers, with current line marked as bold*
