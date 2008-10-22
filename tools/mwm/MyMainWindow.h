@@ -2,10 +2,13 @@
 #define MYMAINWINDOW_H
 
 #include <QMainWindow>
-#include <QResizeEvent>
 
+class QResizeEvent;
 class QTabWidget;
 class QWidget;
+class QMenu;
+class QAction;
+
 
 class MyMainWindow: public QMainWindow
 {
@@ -19,18 +22,33 @@ protected:
 	
 public slots:
 	void initGUI();
+	void initMenu();
 	void restoreSettings();
 	void saveSettings();
+	
+	void updateFrame();
 	void removeFrame();
 	
 	void on_maximizeButton_clicked();
 	void on_minimizeButton_clicked();
 	void on_closeButton_clicked();
+	void on_actionToggleGUI_triggered();
 	
 private:
-	QWidget		*leftButton;
+	QWidget		*leftButtons;
 	QWidget		*rightButtons;
 	QTabWidget	*tabWidget;
+	
+	QMenu *fileMenu;
+	QMenu *editMenu;
+	QMenu *settingsMenu;
+	QMenu *helpMenu;
+	
+	QAction *actionNew;
+	QAction *actionOpen;
+	QAction *actionSave;
+	QAction *actionSaveAs;
+	QAction *actionToggleGUI;
 };
 
 #endif // MYMAINWINDOW_H
