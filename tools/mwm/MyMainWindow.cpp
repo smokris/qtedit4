@@ -48,7 +48,8 @@ void MyMainWindow::initGUI()
 	QBoxLayout *l;
 	
 // buttons on the left
-	leftButtons = new QWidget;
+	leftButtons = new QWidget(tabWidget);
+	leftButtons->hide();
 	l = new QBoxLayout(QBoxLayout::LeftToRight);
 	QToolButton	*newButton = new QToolButton;
 	QToolButton	*openButton = new QToolButton;
@@ -77,7 +78,8 @@ void MyMainWindow::initGUI()
 	leftButtons->setLayout( l );
 	
 // buttons on the right	
-	rightButtons = new QWidget;
+	rightButtons = new QWidget(tabWidget);
+	rightButtons->hide();
 	l = new QBoxLayout(QBoxLayout::LeftToRight);
 	QToolButton	*minButton = new QToolButton(this);
 	QToolButton	*maxButton = new QToolButton(this);
