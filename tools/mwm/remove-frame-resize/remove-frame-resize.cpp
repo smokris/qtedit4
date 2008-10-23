@@ -6,6 +6,22 @@
 #include <QBoxLayout>
 #include <QTextEdit>
 
+/*
+To compile:
+qmake -project
+qmake
+make
+
+Bug:
+When maximizing the window, the window will toggle between 3 states, not 2
+ 1) normal
+ 2) maximized without border
+ 3) pseudo full screen
+ 
+This is triggeered by the resize() call, if commented out, the maximize/unmiximize 
+works as expected with 2 states
+*/
+ 
 class MyMainWindow: public QMainWindow
 {
 	Q_OBJECT
@@ -33,7 +49,7 @@ int main( int argc, char *argv[] )
 	return app.exec();
 }
 
-#include "test1.moc"
+#include "remove-frame-resize.moc"
 
 MyMainWindow::MyMainWindow( QWidget * parent, Qt::WindowFlags flags )
 	: QMainWindow( parent, flags )
@@ -98,7 +114,7 @@ MyMainWindow::MyMainWindow( QWidget * parent, Qt::WindowFlags flags )
 
 	move( QPoint(100,100) );
 
-	// uncomment this to see the borked!
+	// BUG: uncomment this to see the borked!
 	resize( QSize(500,300) );
 }
 
