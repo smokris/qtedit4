@@ -38,6 +38,18 @@ svn co http://qtedit4.googlecode.com/svn/tools/qmdilib/
 }}}
 
 == Changelog ==
+0.0.5 - SOMEDAY - Diego Iastrubni <diegoiast@gmail.com> (not officialy relseased yet, only a developer snapshot based on revision 304)
+ * code is released now under a dual license: (L)GPL 2 or 3
+ * code refactoring: qmdiClient::mdiClientFileName() should be used instead of old "filename"
+ * code refactoring: qmdiClient::name has been renamed to qmdiClient::mdiClientName
+ * code refactoring: include files for qmdiActionGroup and qmdiActionGroupList changed from
+   "actiongroup.h" and "actiongrouplist.h" into "qmdiactiongroup.h" and qmdiactiongrouplist.h"
+   Transitional includes have been added, to be removed next version, please update your code
+ * new feature: qmdiClients are notified of (un)merged from a host
+ * new feature: qmdiTabWidget will hide the tabbar if the number of tabs is less then 2 
+ * new feature: when qmdiHost adds a qmdiClient if that client is also a widget, add it's menus+toolbars actions to the widget.
+ * new feature: you can tell qmdiHost not to update it's GUI by changing qmdiHost::updateMenusAndToolBars
+
 0.0.4 - 29 Jun 2007 - Diego Iastrubni
  * Documentation re-created using doxygen 1.4.7
  * code refactoring: qmdiClient - qmdiServer is now a public member
@@ -60,9 +72,15 @@ svn co http://qtedit4.googlecode.com/svn/tools/qmdilib/
  * removed most internal frames from all widgets in demos, the demos will look nicer
  * all the documentation has been spell checked
 
-0.0.2
+0.0.2 - 11 Jul 06 - Diego Iastrubni <elcuco@kde.org>
  * fixed many flickering issues, now it only flicker when you add QWidgets to qmdiActionGroup
  * added demos (4 and 5) which demonstrate how to build the code into dynamic and static libraries.
  * Documentation updates.
  * Compilation problems on mingw fixed since 0.0.2-pre
 
+0.0.2-pre  - 19 Jul 06 - Diego Iastrubni <elcuco@kde.org>
+ * fixed many flickering issues, now it only flickers when you add QWidgets to qmdiActionGroup
+ * added demos (4 and 5) which demonstrate how to build the code into dynamic and static libraries
+ 
+0.0.1 - 11 Jun 06 - Diego Iastrubni <elcuco@kde.org>
+ * initial release
