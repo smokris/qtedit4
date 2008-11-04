@@ -15,13 +15,25 @@ public:
 	bool saveProject( QString newFileName );
 	bool isLoaded();
 	void clearData();
-	
+
+	bool addFile( QString fileName, QString category=QString() );
+	bool removeFile( QString fileName );
+	QStringList getFiles(QString category=QString());
+	QStringList getCategoryList();
+
+	QVariant getVariableValue( QString section );
+	void setVariableValue( QString section, QVariant value );
+	void addVariableValue( QString section, QVariant value );
+	void delVariableValue( QString section, QVariant value );
+	void delVariable( QString section );
+
 private:
 	void setTokens(QStringList tokens);
 	void appendTokens(QStringList tokens);
 	void removeTokens(QStringList tokens);
 	
 	QHash<QString,QStringList> m_data;
+	QList<QString> m_secctions;
 };
 
 #endif // QMAKEPROJECT_H

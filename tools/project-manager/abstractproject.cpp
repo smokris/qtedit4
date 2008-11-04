@@ -5,7 +5,7 @@ AbstractProject::AbstractProject( QObject *parent, QString fileName )
 	: QObject(parent)
 {
 	m_fileName = fileName;
-// 	loadProject( fileName );
+//	loadProject( fileName );
 }
 
 AbstractProject::AbstractProject( QString fileName, QObject *parent )
@@ -19,36 +19,15 @@ AbstractProject::~AbstractProject()
 	// nothing to do
 }
 
-bool AbstractProject::addFile( QString fileName, QString category )
-{
-	m_files[category] << fileName;
-	return true;
-}
-
-
 bool AbstractProject::addFiles( QStringList fileNames, QString category )
 {
+	bool b = true;
 	foreach( QString s, fileNames )
 	{
-		m_files[category] << s;
+		b &= addFile( s, category );
 	}
 	
-	return true;
-}
-
-bool AbstractProject::removeFile( QString fileName )
-{
-	QHash<QString,QStringList>::const_iterator i = m_files.constBegin();
-	while (i != m_files.constEnd()) 
-	{
-		int j = m_files[i.key()].indexOf(fileName);
-		if (j == -1)
-			return false;
-		m_files[i.key()].removeAt(j);
-		++i;
-	}
-	
-	return true;
+	return b;
 }
 
 bool AbstractProject::removeFiles( QStringList fileNames )
@@ -60,11 +39,6 @@ bool AbstractProject::removeFiles( QStringList fileNames )
 	}
 	
 	return b;
-}
-
-QStringList AbstractProject::getFiles(QString category)
-{
-	return m_files[category];
 }
 
 bool AbstractProject::addSubProject( AbstractProject *subProject )
@@ -137,25 +111,29 @@ void AbstractProject::setTargetName( QString newTargetName )
 
 void AbstractProject::clear()
 {
-	m_files.clear();
 	m_subProjects.clear();
 }
 
-void AbstractProject::dumpProject()
+void AbstractProject::dumpProject( int depth )
 {
-	QHash<QString,QStringList>::const_iterator i = m_files.constBegin();
-	qDebug() << "NAME" << "->" << m_projectName;
-	qDebug() << "TARGET" << "->" << m_targetName;
+	QString filler;
+	filler.fill( '\t', depth );
+
+	qDebug() << filler << "NAME" << "->" << m_projectName;
+	qDebug() << filler << "TARGET" << "->" << m_targetName;
 	
-	// for each file category
-	while (i != m_files.constEnd()) 
+	foreach( QString category, getCategoryList() )
 	{
-		qDebug() << i.key() << "->" << i.value();
-		++i;
+		qDebug() << category;
+		foreach( QString fileName, getFiles(category) )
+			qDebug() << filler << "\t" << fileName;
 	}
 	
-	
 	// now dump, sub projects
+	foreach( AbstractProject *project, m_subProjects )
+	{
+		project->dumpProject( depth + 1 );
+	}
 }
 
 // kate: space-indent off; tab-indent on; tab-width 8; indent-width 8;

@@ -5,6 +5,8 @@
 #include <QString>
 #include <QStringList>
 #include <QHash>
+#include <QMultiHash>
+#include <QVariant>
 
 class AbstractProject : public QObject
 {
@@ -14,11 +16,17 @@ public:
 	AbstractProject( QString fileName=QString(), QObject *parent=NULL );
 	virtual ~AbstractProject();
 	
-	bool addFile( QString fileName, QString category=QString() );
-	bool addFiles( QStringList fileNames, QString category=QString() );
-	bool removeFile( QString fileName );
-	bool removeFiles( QStringList fileNames );
-	QStringList getFiles(QString category=QString());
+	virtual bool newProject( QString newProjectName ) = 0;
+	virtual bool loadProject( QString newFileName ) = 0;
+	virtual bool saveProject( QString newFileName ) = 0;
+	virtual bool isLoaded() = 0;
+
+	virtual bool addFile( QString fileName, QString category=QString() ) = 0;
+	virtual bool addFiles( QStringList fileNames, QString category=QString() );
+	virtual bool removeFile( QString fileName ) = 0;
+	virtual bool removeFiles( QStringList fileNames );
+	virtual QStringList getFiles(QString category=QString()) = 0;
+	virtual QStringList getCategoryList() = 0;
 	
 	bool addSubProject( AbstractProject *subProject );
 	bool removeSubProject( AbstractProject *subProject );
@@ -26,24 +34,34 @@ public:
 	bool removeSubProjects( QStringList fileNames );
 	QList<AbstractProject*> getSubProjects();
 	
+	virtual QVariant getVariableValue( QString section ) = 0;
+	virtual void setVariableValue( QString section, QVariant value ) = 0;
+	virtual void addVariableValue( QString section, QVariant value ) = 0;
+	virtual void delVariableValue( QString section, QVariant value ) = 0;
+	virtual void delVariable( QString section ) = 0;
+	
 	QString getProjectName();
 	void setProjectName( QString newProjectName );
 	QString getTargetName();
 	void setTargetName( QString newTargetName );
 	void clear();
 	
-	void dumpProject();
+	void dumpProject( int depth=0 );
 	
-	virtual bool newProject( QString newProjectName ) = 0;
-	virtual bool loadProject( QString newFileName ) = 0;
-	virtual bool saveProject( QString newFileName ) = 0;
-	virtual bool isLoaded() = 0;
 	
 protected:
-	QHash<QString,QStringList> m_files;	// modified by add/remove file
+	// list of all sub-projects in this project
+	// modified by addSubProject(), removeSubProject(), removeSubProjects()
 	QList<AbstractProject*> m_subProjects;	// modified by add/remove sub projects
-	QString m_fileName;			// should be modified by load, save
-	QString m_projectName;			// modified by set/get project name
+	
+	// should be modified by load, save
+	QString m_fileName;
+	
+	// modified by set/get project name
+	QString m_projectName;
+	
+	// the exe/library name this project targets. not always defined
+	// modified by setTargetName
 	QString m_targetName;
 };
 
