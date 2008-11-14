@@ -111,6 +111,8 @@ void AbstractProject::setTargetName( QString newTargetName )
 
 void AbstractProject::clear()
 {
+	m_projectName.clear();
+	m_targetName.clear();
 	m_subProjects.clear();
 }
 

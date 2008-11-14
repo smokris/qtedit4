@@ -44,7 +44,7 @@ public:
 	void setProjectName( QString newProjectName );
 	QString getTargetName();
 	void setTargetName( QString newTargetName );
-	void clear();
+	virtual void clear();
 	
 	void dumpProject( int depth=0 );
 	

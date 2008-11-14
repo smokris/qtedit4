@@ -14,7 +14,7 @@ public:
 	bool loadProject( QString newFileName );
 	bool saveProject( QString newFileName );
 	bool isLoaded();
-	void clearData();
+	void clear();
 
 	bool addFile( QString fileName, QString category=QString() );
 	bool removeFile( QString fileName );

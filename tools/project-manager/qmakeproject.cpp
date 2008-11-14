@@ -41,7 +41,7 @@ bool QMakeProject::loadProject( QString newFileName )
 		return false;
 	QString text = in.readAll();
 	in.close();
-	clearData();
+	clear();
 	
 	text.replace( QRegExp("#[^\n]*"), "" );
 	text.replace( QRegExp("\\\\\\s*\n"), " " );
@@ -139,10 +139,10 @@ bool QMakeProject::isLoaded()
 	return true;
 }
 
-void QMakeProject::clearData()
+void QMakeProject::clear()
 {
+	AbstractProject::clear();
 	m_data.clear();
-	clear();
 }
 
 bool QMakeProject::addFile( QString fileName, QString category )
