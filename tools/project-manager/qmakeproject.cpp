@@ -1,6 +1,7 @@
 #include "qmakeproject.h"
 
 #include <QFile>
+#include <QFileInfo>
 #include <QRegExp>
 #include <QDebug>
 
@@ -31,7 +32,9 @@ bool QMakeProject::loadProject( QString newFileName )
 {
 	if (newFileName.isEmpty())
 		return true;
-	
+
+	qDebug() << "\t -> Loading file" << newFileName;
+
 	// based on code from http://doc.trolltech.com/qq/qq01-seriously-weird-qregexp.html
 	QFile in( newFileName );
 	if ( !in.open(QIODevice::ReadOnly))
@@ -69,17 +72,29 @@ bool QMakeProject::loadProject( QString newFileName )
 		else if (tokens[1] == "-=")
 			removeTokens( tokens );
 	}
-	
-	// now we have the file loaded as meta-data, propagate this 
-	// to the AbstractProject data
-//	foreach( QString s, m_secctions )
-//	{
-//		addFiles( m_data[s], s );
-//	}
-	
+
 	if (m_data["TARGET"].count()>=1)
 		setTargetName(m_data["TARGET"].at(0));
 	setProjectName(newFileName);
+	m_fileName = newFileName;
+
+	if (m_data["TEMPLATE"][0].toLower() == "subdirs")
+	{	// sweet, using sub projetcs load each one of them
+		foreach(QString s, m_data["SUBDIRS"] )
+		{
+			if (isRelativePath(s))
+			{
+				QFileInfo fi(m_fileName);
+				QString path = fi.absolutePath();
+				if (path.isEmpty())
+					continue;
+				s = path + "/" + s;
+			}
+			QMakeProject *p = new QMakeProject( this, s );
+			addSubProject( p );
+		}
+	}
+
 	return true;
 }
 
@@ -126,14 +141,6 @@ bool QMakeProject::isLoaded()
 
 void QMakeProject::clearData()
 {
-/*	QHash<QString,QStringList>::const_iterator i = m_data.constBegin();
-	while (i != m_files.constEnd()) 
-	{
-		qDebug() << i.key() << m_data[i.key()];
-		m_data[i.key()].clear();
-		qDebug() << i.key() << m_data[i.key()];
-		++i;
-	}*/
 	m_data.clear();
 	clear();
 }
@@ -234,6 +241,27 @@ void QMakeProject::removeTokens(QStringList tokens)
 	{
 		m_data[category].removeAll(tokens[i]);
 	}
+}
+
+bool QMakeProject::isRelativePath( QString path )
+{
+	if (path.isEmpty())
+		return true;
+	if ((path.at(0) == '/') || (path.at(0) == '\\'))
+		return false;
+	if (path.length() > 2)
+	{
+		if (path.at(1) == ':')
+		{	//
+			QChar drive = path.at(0);
+			if (drive.isLetter())
+				return false;
+		}
+		return true;
+	}
+	else	// it's a drive letter only
+		return false;
+	
 }
 
 // kate: space-indent off; tab-indent on; tab-width 8; indent-width 8;

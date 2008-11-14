@@ -119,14 +119,18 @@ void AbstractProject::dumpProject( int depth )
 	QString filler;
 	filler.fill( '\t', depth );
 
-	qDebug() << filler << "NAME" << "->" << m_projectName;
-	qDebug() << filler << "TARGET" << "->" << m_targetName;
+	qDebug( "\n%sDumping project", qPrintable(filler) );
+	qDebug( "%s\tname\t%s", qPrintable(filler), qPrintable(m_projectName) );
+	qDebug( "%s\ttarget\t%s", qPrintable(filler), qPrintable(m_targetName) );
 	
 	foreach( QString category, getCategoryList() )
 	{
-		qDebug() << category;
+		if (category=="NAME") continue;
+		if (category=="TARGET") continue;
+
+		qDebug( "\t%s%s", qPrintable(filler), qPrintable(category) );
 		foreach( QString fileName, getFiles(category) )
-			qDebug() << filler << "\t" << fileName;
+			qDebug( "%s\t\t%s", qPrintable(filler), qPrintable(fileName) );
 	}
 	
 	// now dump, sub projects

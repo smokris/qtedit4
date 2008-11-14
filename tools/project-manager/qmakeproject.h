@@ -31,6 +31,7 @@ private:
 	void setTokens(QStringList tokens);
 	void appendTokens(QStringList tokens);
 	void removeTokens(QStringList tokens);
+	bool isRelativePath( QString path );
 	
 	QHash<QString,QStringList> m_data;
 	QList<QString> m_secctions;
