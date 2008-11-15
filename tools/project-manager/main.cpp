@@ -16,25 +16,30 @@ int main( int argc, char *argv[] )
 	loadTest();
 	saveTest();
 	loadSaveTest();
+
+	qDebug("-------------- project should be clean");
+	p.clear();
+	p.dumpProject();
 	return 0;
 }
 
 void loadTest()
 {
 	QStringList list;
-	list	<< "tests/test1.pro"
-		<< "tests/test2.pro"
-		<< "tests/test3.pro"
+	list
+		<< "tests/test1.pro"	// tests = assignment
+		<< "tests/test2.pro"	// tests +=
+		<< "tests/test3.pro"	// tests -=
+		<< "tests/test5.pro"	// tests subdirs
 		<< "tests/arora.pro"
 	;
 
-	qDebug("--------------");
 	foreach( QString s, list)
 	{
+		qDebug("--------------");
 		qDebug() << "Test - loading" << s;
 		p.loadProject(s);
 		p.dumpProject();
-		qDebug("--------------");
 	}
 }
 
@@ -43,7 +48,7 @@ void saveTest()
 	QString fileName = "tests/test4.pro";
 	qDebug() << "Test - saving" << fileName;
 
-	p.clearData();
+	p.clear();
 	p.addFile( "main.cpp", "SOURCES" );
 	p.addFile( "foo.cpp", "SOURCES" );
 	p.addFile( "foo.h", "HEADERS" );
@@ -55,7 +60,7 @@ void saveTest()
 void loadSaveTest()
 {
 	qDebug() << "Loading tests/test1.pro, saving tests/test1_s.pro";
-	p.clearData();
+	p.clear();
 	p.loadProject("tests/test1.pro");
 	p.saveProject("tests/test1_s.pro");
 }
