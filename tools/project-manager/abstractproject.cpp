@@ -5,7 +5,6 @@ AbstractProject::AbstractProject( QObject *parent, QString fileName )
 	: QObject(parent)
 {
 	m_fileName = fileName;
-//	loadProject( fileName );
 }
 
 AbstractProject::AbstractProject( QString fileName, QObject *parent )
@@ -121,9 +120,8 @@ void AbstractProject::dumpProject( int depth )
 	QString filler;
 	filler.fill( '\t', depth );
 
-	qDebug( "\n%sDumping project", qPrintable(filler) );
-	qDebug( "%s\tname\t%s", qPrintable(filler), qPrintable(m_projectName) );
-	qDebug( "%s\ttarget\t%s", qPrintable(filler), qPrintable(m_targetName) );
+	qDebug( "\n%sDumping project %s", qPrintable(filler),qPrintable(m_projectName) );
+	qDebug( "%s\tTARGET\t%s", qPrintable(filler), qPrintable(m_targetName) );
 	
 	foreach( QString category, getCategoryList() )
 	{

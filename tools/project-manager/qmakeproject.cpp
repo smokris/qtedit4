@@ -33,8 +33,6 @@ bool QMakeProject::loadProject( QString newFileName )
 	if (newFileName.isEmpty())
 		return true;
 
-	qDebug() << "\t -> Loading file" << newFileName;
-
 	// based on code from http://doc.trolltech.com/qq/qq01-seriously-weird-qregexp.html
 	QFile in( newFileName );
 	if ( !in.open(QIODevice::ReadOnly))
@@ -78,14 +76,14 @@ bool QMakeProject::loadProject( QString newFileName )
 	setProjectName(newFileName);
 	m_fileName = newFileName;
 
-	if (m_data["TEMPLATE"][0].toLower() == "subdirs")
+	if ((!m_data["TEMPLATE"].empty()) && (m_data["TEMPLATE"][0].toLower() == "subdirs"))
 	{	// sweet, using sub projetcs load each one of them
 		foreach(QString s, m_data["SUBDIRS"] )
 		{
 			if (isRelativePath(s))
 			{
 				QFileInfo fi(m_fileName);
-				QString path = fi.absolutePath();
+				QString path = fi.path();
 				if (path.isEmpty())
 					continue;
 				s = path + "/" + s;
