@@ -7,19 +7,21 @@ void saveTest();
 void loadSaveTest();
 
 // make this a shared project, this should not get fuckedup
-QMakeProject p(NULL);
+//QMakeProject p(NULL);
+AbstractProject *p = NULL;
 
 int main( int argc, char *argv[] )
 {
 	QCoreApplication app(argc,argv);
+	p = new QMakeProject(NULL);
 
 	loadTest();
 	saveTest();
 	loadSaveTest();
 
 	qDebug("-------------- project should be clean");
-	p.clear();
-	p.dumpProject();
+	p->clear();
+	p->dumpProject();
 	return 0;
 }
 
@@ -38,8 +40,8 @@ void loadTest()
 	{
 		qDebug("--------------");
 		qDebug() << "Test - loading" << s;
-		p.loadProject(s);
-		p.dumpProject();
+		p->loadProject(s);
+		p->dumpProject();
 	}
 }
 
@@ -48,21 +50,21 @@ void saveTest()
 	QString fileName = "tests/test4.pro";
 	qDebug() << "Test - saving" << fileName;
 
-	p.clear();
-	p.addFile( "main.cpp", "SOURCES" );
-	p.addFile( "foo.cpp", "SOURCES" );
-	p.addFile( "foo.h", "HEADERS" );
-	p.setProjectName("test4");
-	p.setTargetName("test4");
-	p.saveProject(fileName);
+	p->clear();
+	p->addFile( "main.cpp", "SOURCES" );
+	p->addFile( "foo.cpp", "SOURCES" );
+	p->addFile( "foo.h", "HEADERS" );
+	p->setProjectName("test4");
+	p->setTargetName("test4");
+	p->saveProject(fileName);
 }
 
 void loadSaveTest()
 {
 	qDebug() << "Loading tests/test1.pro, saving tests/test1_s.pro";
-	p.clear();
-	p.loadProject("tests/test1.pro");
-	p.saveProject("tests/test1_s.pro");
+	p->clear();
+	p->loadProject("tests/test1.pro");
+	p->saveProject("tests/test1_s.pro");
 }
 
 
