@@ -4,6 +4,7 @@
 #include "../qmakeproject.h"
 #include "../abstractproject.h"
 #include "projectmodel.h"
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
@@ -11,6 +12,13 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 	ui.setupUi(this);
 	m_project = NULL;
 	m_model = NULL;
+
+#if 1
+	m_project = new QMakeProject( this );
+	m_project->loadProject("../tests/test1.pro");
+	m_model = new ProjectModel( this, m_project );
+	ui.treeView->setModel( m_model );
+#endif
 }
 
 MainWindow::~MainWindow()
@@ -35,7 +43,7 @@ void MainWindow::on_loadButton_clicked()
 {
 	qDebug() << __FILE__ << __LINE__;
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open project"),
-							"../tests/", tr("Projects (*.pro *.pri *.prf)"));
+		"../tests/", tr("Projects (*.pro *.pri *.prf)"));
 	if (fileName.isEmpty())
 		return;
 	
@@ -43,11 +51,13 @@ void MainWindow::on_loadButton_clicked()
 		m_project = new QMakeProject( this );
 	
 	m_project->loadProject( fileName );
+//	m_project->dumpProject();
 	ui.projectLabel->setText( fileName );
 	
-	if (!m_model)
-	{
+	if (!m_model) {
 		m_model = new ProjectModel( this, m_project );
+		ui.treeView->setModel( m_model );
+	} else {
+		((ProjectModel*)m_model)->resync();
 	}
-	ui.treeView->setModel( m_model );
 }

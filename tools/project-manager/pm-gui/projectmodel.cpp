@@ -4,91 +4,47 @@
 #include <QDebug>
 
 ProjectModel::ProjectModel( QObject* parent, AbstractProject *project )
-            :QAbstractItemModel(parent)
+	    :QStandardItemModel(parent)
 {
-    m_project = project;
+	m_project = project;
+	setColumnCount(2);
+	resync();
 }
 
-
-// reimplemented shit
-QModelIndex ProjectModel::index( int row, int col, const QModelIndex &parent  ) const
+void ProjectModel::resync()
 {
-// QModelIndex QAbstractItemModel::createIndex ( int row, int column, void * ptr = 0 ) const   [protected]
-	int id = parent.internalId();
-	qDebug() << __FILE__ << __LINE__ << id;
-	return createIndex( row, col, id+1 );
-}
+	this->clear();
+	m_categorieItems.clear();
+	int i = 0;
 
-QModelIndex ProjectModel::parent( const QModelIndex & child ) const
-{
-	int id = child.internalId();
-	qDebug() << __FILE__ << __LINE__ << id;
-	return QModelIndex();
-        Q_UNUSED(child);
-}
+	foreach (QString s, m_project->getCategoryList()) {
+		QStandardItem *category = new QStandardItem(s);
+		QStringList   items     = m_project->getFiles(s);
 
-int ProjectModel::rowCount( const QModelIndex &parent ) const
-{
-	if (m_project == NULL)
-		return 0;
+		m_categorieItems[s] = category;
+		category->setColumnCount(2);
+		appendRow(category);
 
-	int count = 0;
-	if (parent.column() == -1)
-		count = m_project->getCategoryList().count();
-	else
-		count = m_project->getFiles(m_project->getCategoryList().at(parent.row())).count();
-	if (count<2)
-		count = 0;
-
-	return count;
-}
-
-int ProjectModel::columnCount( const QModelIndex &parent ) const
-{
-	return 2;
-}
-
-QVariant ProjectModel::data( const QModelIndex &index, int role ) const
-{
-	if (role != Qt::DisplayRole)
-		return QVariant();
-
-	if (!index.isValid())
-		return QVariant();
-
-	int column = index.column();
-	int row    = index.row();
-
-	QString cat;
-	switch (column)
-	{
-		case 0:
-//			qDebug() << __FILE__ << __LINE__ << QString("at item %1, parent %2").arg(row).arg(index.parent().row());
-			if (m_project->getCategoryList().count() <= row)
-				return QVariant();
-			cat = m_project->getCategoryList().at( row );
-
-	//		QString cat = m_project->getCategoryList().at( index.parent().row() );
-	//		return m_project->getFiles(cat).at(row);
-
-			return cat;
-		case 1:
-			int itemCount = rowCount( index );
-			if (itemCount == 0)
-			{
-				if (m_project->getCategoryList().count() <= row)
-					return QVariant();
-
-				QString cat = m_project->getCategoryList().at( row );
-				if (m_project->getFiles(cat).count()!=1)
-					return QVariant();
-
-				return m_project->getFiles(cat).at(0);
+		if (items.count() < 2){
+			QString value;
+			value = items.join(",");
+			category->setToolTip(value);
+			QStandardItem *i2 = new QStandardItem(value);
+			setItem(i,1,i2);
+//			qDebug( "single value [%s] = %s", qPrintable(s),qPrintable(value));
+		}
+		else {
+			foreach( QString f, items) {
+				QStandardItem *i2 = new QStandardItem(f);
+				category->appendRow(i2);
 			}
-			else
-				return QVariant();
+		}
+		i++;
 	}
 
-	// make gcc happy
-	return QVariant();
+	// WTF this needs to be here?
+	setHeaderData( 0, Qt::Horizontal, tr("Category"), Qt::DisplayRole );
+	setHeaderData( 1, Qt::Horizontal, tr("Value")   , Qt::DisplayRole );
 }
+
+
