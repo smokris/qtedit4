@@ -12,39 +12,41 @@ class AbstractProject : public QObject
 {
 	Q_OBJECT
 public:
-	AbstractProject( QObject *parent=NULL, QString fileName=QString() );
-	AbstractProject( QString fileName=QString(), QObject *parent=NULL );
+	AbstractProject( QObject *parent=NULL, const QString fileName=QString() );
+	AbstractProject( const QString fileName=QString(), QObject *parent=NULL );
 	virtual ~AbstractProject();
 	
-	virtual bool newProject( QString newProjectName ) = 0;
-	virtual bool loadProject( QString newFileName ) = 0;
-	virtual bool saveProject( QString newFileName ) = 0;
+	virtual bool newProject( const QString newProjectName ) = 0;
+	virtual bool loadProject( const QString newFileName ) = 0;
+	virtual bool saveProject( const QString newFileName ) = 0;
 	virtual bool isLoaded() = 0;
 
-	virtual bool addFile( QString fileName, QString category=QString() ) = 0;
-	virtual bool addFiles( QStringList fileNames, QString category=QString() );
-	virtual bool removeFile( QString fileName ) = 0;
-	virtual bool removeFiles( QStringList fileNames );
-	virtual QStringList getFiles(QString category=QString()) = 0;
+	virtual bool addFile( const QString fileName, QString category=QString() ) = 0;
+	virtual bool addFiles( const QStringList fileNames, QString category=QString() );
+	virtual bool removeFile( const QString fileName ) = 0;
+	virtual bool removeFiles( const QStringList fileNames );
+	virtual QStringList getFiles(const QString category=QString()) = 0;
 	virtual QStringList getCategoryList() = 0;
 	
 	bool addSubProject( AbstractProject *subProject );
 	bool removeSubProject( AbstractProject *subProject );
-	bool removeSubProject( QString fileName );
-	bool removeSubProjects( QStringList fileNames );
+	bool removeSubProject( const QString fileName );
+	bool removeSubProjects( const QStringList fileNames );
 	QList<AbstractProject*> getSubProjects();
 	
 	virtual QVariant getVariableValue( QString section ) = 0;
-	virtual void setVariableValue( QString section, QVariant value ) = 0;
-	virtual void addVariableValue( QString section, QVariant value ) = 0;
-	virtual void delVariableValue( QString section, QVariant value ) = 0;
-	virtual void delVariable( QString section ) = 0;
+	virtual void setVariableValue( const QString section, QVariant value ) = 0;
+	virtual void addVariableValue( const QString section, QVariant value ) = 0;
+	virtual void delVariableValue( const QString section, QVariant value ) = 0;
+	virtual void delVariable( const QString section ) = 0;
 	
 	QString getProjectName();
-	void setProjectName( QString newProjectName );
+	void setProjectName( const QString newProjectName );
 	QString getTargetName();
-	void setTargetName( QString newTargetName );
+	void setTargetName( const QString newTargetName );
 	virtual void clear();
+
+	virtual bool isSectionList( const QString section );
 	
 	void dumpProject( int depth=0 );
 	

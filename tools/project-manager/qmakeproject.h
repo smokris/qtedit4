@@ -27,6 +27,8 @@ public:
 	void delVariableValue( QString section, QVariant value );
 	void delVariable( QString section );
 
+	bool isSectionList(const QString);
+
 private:
 	void setTokens(QStringList tokens);
 	void appendTokens(QStringList tokens);

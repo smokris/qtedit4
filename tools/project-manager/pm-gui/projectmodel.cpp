@@ -25,7 +25,7 @@ void ProjectModel::resync()
 		category->setColumnCount(2);
 		appendRow(category);
 
-		if (items.count() < 2){
+		if (!m_project->isSectionList(s)) {
 			QString value;
 			value = items.join(",");
 			category->setToolTip(value);

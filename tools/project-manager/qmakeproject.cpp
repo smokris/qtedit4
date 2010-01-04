@@ -210,6 +210,18 @@ QStringList QMakeProject::getCategoryList()
 	return m_data.keys();
 }
 
+bool QMakeProject::isSectionList(const QString s)
+{
+	if (s == "SOURCES")
+		return true;
+	else if (s == "FORMS")
+		return true;
+	else if (s == "HEADERS")
+		return true;
+
+	return false;
+}
+
 void QMakeProject::setTokens(QStringList tokens)
 {
 	QString category = tokens[0];

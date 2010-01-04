@@ -32,8 +32,8 @@ void loadTest()
 		<< "tests/test1.pro"	// tests = assignment
 		<< "tests/test2.pro"	// tests +=
 		<< "tests/test3.pro"	// tests -=
-		<< "tests/test5.pro"	// tests subdirs
-		<< "tests/arora.pro"
+		<< "tests/test5.pro"	// tests dump_project
+//		<< "tests/arora.pro"
 	;
 
 	foreach( QString s, list)
