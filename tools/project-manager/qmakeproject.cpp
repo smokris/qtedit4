@@ -38,6 +38,7 @@ bool QMakeProject::loadProject( QString newFileName )
 	if ( !in.open(QIODevice::ReadOnly))
 		return false;
 	QString text = in.readAll();
+	m_fileName = in.fileName();
 	in.close();
 	clear();
 	
@@ -126,7 +127,7 @@ bool QMakeProject::saveProject( QString newFileName )
 		out << "\n";
 		++i;
 	}
-	
+	m_fileName = file.fileName();
 	file.close();
 
 	return true;
@@ -143,8 +144,49 @@ void QMakeProject::clear()
 	m_data.clear();
 }
 
+
 bool QMakeProject::addFile( QString fileName, QString category )
 {
+	// TODO - way too ugly, needs to be fixed
+	if (fileName.startsWith(m_fileName)){
+		fileName.remove(0,m_fileName.length());
+	}
+	
+	// we need to guess the category "manually"
+	if (category.isEmpty()){
+		// normal sources
+		if (fileName.endsWith(".cpp",Qt::CaseInsensitive))
+			category = "SOURCES";
+		else if (fileName.endsWith(".c",Qt::CaseInsensitive))
+			category = "SOURCES";
+		else if (fileName.endsWith(".cxx",Qt::CaseInsensitive))
+			category = "SOURCES";
+		else if (fileName.endsWith(".c++",Qt::CaseInsensitive))
+			category = "SOURCES";
+		else if (fileName.endsWith(".h",Qt::CaseInsensitive))
+			category = "HEADERS";
+		else if (fileName.endsWith(".hpp",Qt::CaseInsensitive))
+			category = "HEADERS";
+		
+		// Qt files
+		else if (fileName.endsWith(".ui",Qt::CaseInsensitive))
+			category = "FORMS";
+		else if (fileName.endsWith(".qrc",Qt::CaseInsensitive))
+			category = "RESOURCES";
+		// windows shites
+		else if (fileName.endsWith(".rc",Qt::CaseInsensitive))
+			category = "RC_FILE";
+		else if (fileName.endsWith(".res",Qt::CaseInsensitive))
+			category = "RES_FILE";
+		
+		// flex, bisson, yacc.. whatever
+		else if (fileName.endsWith(".yacc",Qt::CaseInsensitive))
+			category = "YACCSOURCES";
+		else if (fileName.endsWith(".lex",Qt::CaseInsensitive))
+			category = "LEXSOURCES";
+		else
+			category = "UNKNOWN_FILES";
+	}
 	m_data[category] << fileName;
 
 	return true;
@@ -214,11 +256,19 @@ bool QMakeProject::isSectionList(const QString s)
 {
 	if (s == "SOURCES")
 		return true;
-	else if (s == "FORMS")
-		return true;
 	else if (s == "HEADERS")
 		return true;
-
+	else if (s == "FORMS")
+		return true;
+	else if (s == "RESOURCES")
+		return true;
+	else if (s == "YACCSOURCES")
+		return true;
+	else if (s == "LEXSOURCES")
+		return true;
+	// internally used category
+	else if (s == "UNKNOWN_FILES")
+		return true;
 	return false;
 }
 
