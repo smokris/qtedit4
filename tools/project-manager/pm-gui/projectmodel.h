@@ -12,6 +12,7 @@ public:
 	void resync();
 	
 private:
+	void resync_p(bool onlyVars);
 	AbstractProject *m_project;
 	QHash<QString,QStandardItem*> m_categorieItems;
 };

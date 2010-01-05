@@ -15,9 +15,21 @@ void ProjectModel::resync()
 {
 	this->clear();
 	m_categorieItems.clear();
-	int i = 0;
+	resync_p(false);
+	resync_p(true);
+	// WTF this needs to be here?
+	setHeaderData( 0, Qt::Horizontal, tr("Category"), Qt::DisplayRole );
+	setHeaderData( 1, Qt::Horizontal, tr("Value")   , Qt::DisplayRole );
+}
 
+void ProjectModel::resync_p(bool onlyVars)
+{
+	int i = 0;
 	foreach (QString s, m_project->getCategoryList()) {
+		if (m_project->isSectionList(s) != onlyVars){
+			continue;
+		}
+		
 		QStandardItem *category = new QStandardItem(s);
 		QStringList   items     = m_project->getFiles(s);
 
@@ -42,9 +54,7 @@ void ProjectModel::resync()
 		i++;
 	}
 
-	// WTF this needs to be here?
-	setHeaderData( 0, Qt::Horizontal, tr("Category"), Qt::DisplayRole );
-	setHeaderData( 1, Qt::Horizontal, tr("Value")   , Qt::DisplayRole );
+	
 }
 
 
