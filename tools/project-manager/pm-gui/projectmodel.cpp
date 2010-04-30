@@ -35,26 +35,23 @@ void ProjectModel::resync_p(bool onlyVars)
 
 		m_categorieItems[s] = category;
 		category->setColumnCount(2);
+		category->setEditable(false);
 		appendRow(category);
 
-		if (!m_project->isSectionList(s)) {
-			QString value;
-			value = items.join(",");
-			category->setToolTip(value);
-			QStandardItem *i2 = new QStandardItem(value);
-			setItem(i,1,i2);
-//			qDebug( "single value [%s] = %s", qPrintable(s),qPrintable(value));
+		if (m_project->isSectionList(s)) {
+			foreach( QString itemName, items) {
+				QStandardItem *item = new QStandardItem(itemName);
+				category->appendRow(item);
+			}
 		}
 		else {
-			foreach( QString f, items) {
-				QStandardItem *i2 = new QStandardItem(f);
-				category->appendRow(i2);
-			}
+			QString itemName;
+			itemName = items.join(",");
+			category->setToolTip(itemName);
+			QStandardItem *item = new QStandardItem(itemName);
+			setItem(i,1,item);
 		}
 		i++;
 	}
-
-	
 }
-
 
