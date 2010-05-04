@@ -14,7 +14,6 @@ ProjectModel::ProjectModel( QObject* parent, AbstractProject *project )
 void ProjectModel::resync()
 {
 	this->clear();
-	m_categorieItems.clear();
 	resync_p(false);
 	resync_p(true);
 	// WTF this needs to be here?
@@ -24,34 +23,44 @@ void ProjectModel::resync()
 
 void ProjectModel::resync_p(bool onlyVars)
 {
-	int i = 0;
-	foreach (QString s, m_project->getCategoryList()) {
-		if (m_project->isSectionList(s) != onlyVars){
+	foreach (QString categoryName, m_project->getCategoryList()) {
+		if (m_project->isSectionList(categoryName) != onlyVars){
 			continue;
 		}
 		
-		QStandardItem *category = new QStandardItem(s);
-		QStringList   items     = m_project->getFiles(s);
-
-		m_categorieItems[s] = category;
+		QStandardItem *category = new QStandardItem(categoryName);
+		QStringList   items     = m_project->getFiles(categoryName);
+		QString       itemName;
+		QStandardItem *item;
+		
+		itemName = items.join(",");
+		if (m_project->isSectionList(categoryName))
+			itemName = "(" + itemName + ")";
+		
 		category->setColumnCount(2);
 		category->setEditable(false);
+		category->setToolTip(itemName);
 		appendRow(category);
-
-		if (m_project->isSectionList(s)) {
-			foreach( QString itemName, items) {
-				QStandardItem *item = new QStandardItem(itemName);
-				category->appendRow(item);
+		
+		item = new QStandardItem(itemName);
+		item->setToolTip(itemName);
+		setItem(category->row(),1,item);
+		
+		if (m_project->isSectionList(categoryName)) {
+			item->setEditable(false);
+			QList<QStandardItem*> data, fillers;
+			foreach(itemName, items) {
+				QStandardItem *file   = new QStandardItem(itemName);
+				QStandardItem *filler = new QStandardItem("");
+				filler->setEditable(false);
+				file->setToolTip(itemName);
+				
+				fillers << filler;
+				data    << file;
 			}
+			category->insertColumn(0, fillers);
+			category->insertColumn(1, data);
 		}
-		else {
-			QString itemName;
-			itemName = items.join(",");
-			category->setToolTip(itemName);
-			QStandardItem *item = new QStandardItem(itemName);
-			setItem(i,1,item);
-		}
-		i++;
 	}
 }
 

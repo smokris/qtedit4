@@ -5,6 +5,7 @@
 #include "../abstractproject.h"
 #include "projectmodel.h"
 #include <QDebug>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
@@ -37,6 +38,18 @@ void MainWindow::on_deleteButton_clicked()
 
 void MainWindow::on_addButton_clicked()
 {
+	QStringList files = QFileDialog::getOpenFileNames(this,
+		"Add files to project",
+		"", 
+		"All files (*.*);; Sources (*.cpp,*,h)"
+	);
+	
+	if (files.isEmpty())
+		return;
+	
+	m_project->addFiles(files);
+	((ProjectModel*)m_model)->resync();
+	m_project->dumpProject();
 }
 
 void MainWindow::on_loadButton_clicked()
